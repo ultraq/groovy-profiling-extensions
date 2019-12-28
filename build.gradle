@@ -35,7 +35,7 @@ archivesBaseName = 'profiling-extensions'
 sourceCompatibility = 1.8
 
 group    = 'nz.net.ultraq.extensions'
-artifact = 'thymeleaf-layout-dialect'
+artifact = 'profiling-extensions'
 version  = '0.1.0-SNAPSHOT'
 year     = '2019'
 
