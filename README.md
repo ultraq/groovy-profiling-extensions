@@ -26,4 +26,8 @@ Add a dependency to your project with the following co-ordinates:
 API
 ---
 
-TODO (could use the generated groovydocs?)
+### time(String actionName, Closure closure)
+
+Capture and log the time it takes to perform the given closure.  Logging is done
+via [SLF4J](http://www.slf4j.org/), so some implementation of it is needed to be
+able to view the logs later.
