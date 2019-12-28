@@ -16,4 +16,4 @@
 
 moduleName = profiling-extensions
 moduleVersion = ${moduleVersion}
-extensionClasses = nz.net.ultraq.redhorizon.extensions.ProfilingExtensions
+extensionClasses = nz.net.ultraq.extensions.ProfilingExtensions
