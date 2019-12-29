@@ -28,11 +28,12 @@ import org.slf4j.LoggerFactory
 class ProfilingExtensions {
 
 	private static final Logger logger = LoggerFactory.getLogger(ProfilingExtensions)
+	private static final Map<String,List<Integer>> executionTimesPerAction = [:]
 
 	/**
 	 * Capture and log the time it takes to perform the given closure.
 	 * 
-	 * @param <T>
+	 * @param self
 	 * @param actionName
 	 * @param closure
 	 * @return
@@ -42,7 +43,41 @@ class ProfilingExtensions {
 		def start = System.currentTimeMillis()
 		def result = closure()
 		def finish = System.currentTimeMillis()
-		logger.debug("${actionName} complete.  Execution time: ${finish - start}ms")
+		def executionTime = finish - start
+		logger.debug("${actionName} complete.  Execution time: ${executionTime}ms")
+		return result
+	}
+
+	/**
+	 * Capture and log the time it takes to perform the given closure, and the
+	 * average of the last {@code samples} executions of the specific action.
+	 * 
+	 * @param self
+	 * @param actionName
+	 * @param samples
+	 *   The number of previous executions to include in average calculation.
+	 * @param closure
+	 * @return
+	 */
+	static <T> T timeWithAverage(Object self, String actionName, int samples, Closure<T> closure) {
+
+		def start = System.currentTimeMillis()
+		def result = closure()
+		def finish = System.currentTimeMillis()
+		def executionTime = finish - start
+
+		def executionTimes = executionTimesPerAction[actionName]
+		if (!executionTimes) {
+			executionTimes = new ArrayList<>(samples)
+			executionTimesPerAction[actionName] = executionTimes
+		}
+		if (executionTimes.size() == samples) {
+			executionTimes.remove(0)
+		}
+		executionTimes << executionTime
+		def averageTime = executionTimes.sum() / executionTimes.size()
+
+		logger.debug("${actionName} complete.  Execution time: ${executionTime}ms.  Average time: ${averageTime}ms")
 		return result
 	}
 }
