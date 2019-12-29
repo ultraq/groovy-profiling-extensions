@@ -12,7 +12,8 @@ A collection of Groovy extensions to aid with profiling an application.
 Installation
 ------------
 
-Minimum of Java 8 required.
+Minimum of Java 8 required.  Logging is done via [SLF4J](http://www.slf4j.org/),
+so some implementation of it is needed to be able to view the logs later.
 
 Add a dependency to your project with the following co-ordinates:
 
@@ -27,6 +28,9 @@ API
 
 ### time(String actionName, Closure closure)
 
-Capture and log the time it takes to perform the given closure.  Logging is done
-via [SLF4J](http://www.slf4j.org/), so some implementation of it is needed to be
-able to view the logs later.
+Capture and log the time it takes to perform the given closure.
+
+### timeWithAverage(String actionName, int samples, Closure closure)
+
+Capture and log the time it takes to perform the given closure, and the average
+of the last `samples` executions of the specific action.
