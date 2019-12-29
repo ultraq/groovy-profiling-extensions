@@ -27,15 +27,27 @@ import spock.lang.Specification
  */
 class ProfilingExtensionsTests extends Specification {
 
+	def mockLogger
+	def setup() {
+		mockLogger = Mock(Logger)
+		GroovyStub(LoggerFactory, global: true).getLogger(_) >> mockLogger
+	}
+
 	def "Logs the time the closure took to execute"() {
-		given:
-			def mockLogger = Mock(Logger)
-			GroovyStub(LoggerFactory, global: true).getLogger(_) >> mockLogger
 		when:
 			ProfilingExtensions.time(null, 'Test') {
 				// Nothing happening here
 			}
 		then:
-			1 * mockLogger.debug({ it ==~ /Test complete\.  Execution time: [\d]+ms/ })
+			_ * mockLogger.debug({ it ==~ /Test complete\.  Execution time: [\d]+ms\./ })
+	}
+
+	def "Logs the current and average time the closure took to execute"() {
+		when:
+			ProfilingExtensions.timeWithAverage(null, 'Test for average', 1) {
+				// Nothing happening here
+			}
+		then:
+			_ * mockLogger.debug({ it ==~ /Test for average complete\.  Execution time: [\d]+ms\.  Average time: [\d]+ms\./ })
 	}
 }
