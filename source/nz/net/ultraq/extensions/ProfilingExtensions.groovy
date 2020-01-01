@@ -19,12 +19,15 @@ package nz.net.ultraq.extensions
 import org.slf4j.Logger
 import org.slf4j.LoggerFactory
 
+import groovy.transform.CompileStatic
+
 /**
  * Extensions, often to the main {@code Object} class, for aiding with profiling
  * and performance testing.
  * 
  * @author Emanuel Rabina
  */
+@CompileStatic
 class ProfilingExtensions {
 
 	private static final Logger logger = LoggerFactory.getLogger(ProfilingExtensions)
@@ -79,7 +82,7 @@ class ProfilingExtensions {
 
 		def executions = (executionsPerAction[actionName] ?: 0) + 1
 		if (executions % frequency == 0) {
-			def averageTime = executionTimes.sum() / executionTimes.size()
+			def averageTime = (Long)executionTimes.sum() / executionTimes.size()
 			logger.debug("${actionName} average time: ${averageTime}ms.")
 		}
 		executionsPerAction[actionName] = executions
@@ -130,7 +133,7 @@ class ProfilingExtensions {
 			executionTimes.remove(0)
 		}
 		executionTimes << executionTime
-		def averageTime = executionTimes.sum() / executionTimes.size()
+		def averageTime = (Long)executionTimes.sum() / executionTimes.size()
 
 		logger.debug("${actionName} complete.  Execution time: ${executionTime}ms.  Average time: ${averageTime}ms.")
 		return result
