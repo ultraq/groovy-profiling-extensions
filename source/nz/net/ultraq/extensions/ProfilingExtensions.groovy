@@ -55,17 +55,15 @@ class ProfilingExtensions {
 	/**
 	 * Log the average time it takes to complete the given closure, using the
 	 * values of the last {@code samples} executions and emitting a log only after
-	 * every {@code frequency} calls.
+	 * every {@code samples} calls.
 	 * 
 	 * @param self
 	 * @param actionName
 	 * @param samples
 	 *   The number of previous executions to include in average calculation.
-	 * @param frequency
-	 *   Emit a log after this many calls to the closure.
 	 * @return
 	 */
-	static <T> T average(Object self, String actionName, int samples, int frequency, Closure<T> closure) {
+	static <T> T average(Object self, String actionName, int samples, Closure<T> closure) {
 
 		def start = System.currentTimeMillis()
 		def result = closure()
@@ -81,7 +79,7 @@ class ProfilingExtensions {
 		executionTimes << executionTime
 
 		def executions = (executionsPerAction[actionName] ?: 0) + 1
-		if (executions % frequency == 0) {
+		if (executions % samples == 0) {
 			def averageTime = (Long)executionTimes.sum() / executionTimes.size()
 			logger.debug("${actionName} average time: ${averageTime}ms.")
 		}
