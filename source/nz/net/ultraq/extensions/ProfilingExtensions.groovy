@@ -81,7 +81,7 @@ class ProfilingExtensions {
 		def executions = (executionsPerAction[actionName] ?: 0) + 1
 		if (executions % samples == 0) {
 			def averageTime = (Long)executionTimes.sum() / executionTimes.size()
-			logger.debug("${actionName} average time: ${averageTime}ms.")
+			logger.debug('{} average time: {}ms.', actionName, String.format('%.2f', averageTime))
 		}
 		executionsPerAction[actionName] = executions
 
@@ -102,7 +102,7 @@ class ProfilingExtensions {
 		def result = closure()
 		def finish = System.currentTimeMillis()
 		def executionTime = finish - start
-		logger.debug("${actionName} complete.  Execution time: ${executionTime}ms.")
+		logger.debug('{} complete.  Execution time: {}ms.', actionName, executionTime)
 		return result
 	}
 
@@ -133,7 +133,7 @@ class ProfilingExtensions {
 		executionTimes << executionTime
 		def averageTime = (Long)executionTimes.sum() / executionTimes.size()
 
-		logger.debug("${actionName} complete.  Execution time: ${executionTime}ms.  Average time: ${averageTime}ms.")
+		logger.debug('{} complete.  Execution time: {}ms.  Average time: {}ms.', actionName, executionTime, String.format('%.2f', averageTime))
 		return result
 	}
 }

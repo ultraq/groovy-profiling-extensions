@@ -48,6 +48,6 @@ class ProfilingExtensionsTests extends Specification {
 				// Nothing happening here
 			}
 		then:
-			_ * mockLogger.debug({ it ==~ /Test for average complete\.  Execution time: [\d]+ms\.  Average time: [\d]+ms\./ })
+			_ * mockLogger.debug({ it ==~ /Test for average complete\.  Execution time: [\d]+ms\.  Average time: [\d]+.\d\dms\./ })
 	}
 }
