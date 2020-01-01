@@ -28,7 +28,64 @@ import org.slf4j.LoggerFactory
 class ProfilingExtensions {
 
 	private static final Logger logger = LoggerFactory.getLogger(ProfilingExtensions)
-	private static final Map<String,List<Integer>> executionTimesPerAction = [:]
+	private static final Map<String,Integer> executionsPerAction = [:]
+	private static final Map<String,List<Long>> executionTimesPerAction = [:]
+
+	/**
+	 * Retrieve the value mapped by {@code key} in {@code map}, or call the
+	 * {@code create} closure to set and return that value.
+	 * 
+	 * @param map
+	 * @param key
+	 * @param create
+	 * @return
+	 */
+	private static <T> T getOrCreate(Map<String,T> map, String key, Closure<T> create) {
+		def value = map[key]
+		if (!value) {
+			value = create()
+			map[key] = value
+		}
+		return value
+	}
+
+	/**
+	 * Log the average time it takes to complete the given closure, using the
+	 * values of the last {@code samples} executions and emitting a log only after
+	 * every {@code frequency} calls.
+	 * 
+	 * @param self
+	 * @param actionName
+	 * @param samples
+	 *   The number of previous executions to include in average calculation.
+	 * @param frequency
+	 *   Emit a log after this many calls to the closure.
+	 * @return
+	 */
+	static <T> T average(Object self, String actionName, int samples, int frequency, Closure<T> closure) {
+
+		def start = System.currentTimeMillis()
+		def result = closure()
+		def finish = System.currentTimeMillis()
+		def executionTime = finish - start
+
+		def executionTimes = getOrCreate(executionTimesPerAction, actionName) { ->
+			return new ArrayList<Long>(samples)
+		}
+		if (executionTimes.size() == samples) {
+			executionTimes.remove(0)
+		}
+		executionTimes << executionTime
+
+		def executions = (executionsPerAction[actionName] ?: 0) + 1
+		if (executions % frequency == 0) {
+			def averageTime = executionTimes.sum() / executionTimes.size()
+			logger.debug("${actionName} average time: ${averageTime}ms.")
+		}
+		executionsPerAction[actionName] = executions
+
+		return result
+	}
 
 	/**
 	 * Capture and log the time it takes to perform the given closure.
@@ -66,10 +123,8 @@ class ProfilingExtensions {
 		def finish = System.currentTimeMillis()
 		def executionTime = finish - start
 
-		def executionTimes = executionTimesPerAction[actionName]
-		if (!executionTimes) {
-			executionTimes = new ArrayList<>(samples)
-			executionTimesPerAction[actionName] = executionTimes
+		def executionTimes = getOrCreate(executionTimesPerAction, actionName) { ->
+			return new ArrayList<Long>(samples)
 		}
 		if (executionTimes.size() == samples) {
 			executionTimes.remove(0)

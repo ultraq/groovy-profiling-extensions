@@ -26,6 +26,12 @@ Add a dependency to your project with the following co-ordinates:
 API
 ---
 
+### average(String actionName, int samples, int frequency, Closure closure)
+
+Log the average time it takes to complete the given closure, using the values of
+the last `samples` executions and emitting a log only after every `frequency`
+calls.
+
 ### time(String actionName, Closure closure)
 
 Capture and log the time it takes to perform the given closure.
