@@ -35,7 +35,7 @@ class ProfilingExtensionsTests extends Specification {
 
 	def "Logs the time the closure took to execute"() {
 		when:
-			ProfilingExtensions.time(null, 'Test') {
+			time('Test') {
 				// Nothing happening here
 			}
 		then:
@@ -44,7 +44,7 @@ class ProfilingExtensionsTests extends Specification {
 
 	def "Logs the current and average time the closure took to execute"() {
 		when:
-			ProfilingExtensions.timeWithAverage(null, 'Test for average', 1) {
+			timeWithAverage('Test for average', 1) {
 				// Nothing happening here
 			}
 		then:
