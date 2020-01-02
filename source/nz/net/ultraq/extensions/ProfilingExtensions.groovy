@@ -101,8 +101,10 @@ class ProfilingExtensions {
 		def start = System.currentTimeMillis()
 		def result = closure()
 		def finish = System.currentTimeMillis()
+
 		def executionTime = finish - start
 		logger.debug('{} complete.  Execution time: {}ms.', actionName, executionTime)
+
 		return result
 	}
 
@@ -131,9 +133,10 @@ class ProfilingExtensions {
 			executionTimes.remove(0)
 		}
 		executionTimes << executionTime
-		def averageTime = (Long)executionTimes.sum() / executionTimes.size()
 
+		def averageTime = (Long)executionTimes.sum() / executionTimes.size()
 		logger.debug('{} complete.  Execution time: {}ms.  Average time: {}ms.', actionName, executionTime, String.format('%.2f', averageTime))
+
 		return result
 	}
 }
