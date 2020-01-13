@@ -35,24 +35,6 @@ class ProfilingExtensions {
 	private static final Map<String,List<Long>> executionTimesPerAction = [:]
 
 	/**
-	 * Retrieve the value mapped by {@code key} in {@code map}, or call the
-	 * {@code create} closure to set and return that value.
-	 * 
-	 * @param map
-	 * @param key
-	 * @param create
-	 * @return
-	 */
-	private static <T> T getOrCreate(Map<String,T> map, String key, Closure<T> create) {
-		def value = map[key]
-		if (!value) {
-			value = create()
-			map[key] = value
-		}
-		return value
-	}
-
-	/**
 	 * Log the average time it takes to complete the given closure, using the
 	 * values of the last {@code samples} executions and emitting a log only after
 	 * every {@code samples} calls.
@@ -70,7 +52,7 @@ class ProfilingExtensions {
 		def finish = System.currentTimeMillis()
 		def executionTime = finish - start
 
-		def executionTimes = getOrCreate(executionTimesPerAction, actionName) { ->
+		def executionTimes = executionTimesPerAction.getOrCreate(actionName) { ->
 			return new ArrayList<Long>(samples)
 		}
 		if (executionTimes.size() == samples) {
@@ -126,7 +108,7 @@ class ProfilingExtensions {
 		def finish = System.currentTimeMillis()
 		def executionTime = finish - start
 
-		def executionTimes = getOrCreate(executionTimesPerAction, actionName) { ->
+		def executionTimes = executionTimesPerAction.getOrCreate(actionName) { ->
 			return new ArrayList<Long>(samples)
 		}
 		if (executionTimes.size() == samples) {
