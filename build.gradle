@@ -47,3 +47,7 @@ processResources {
 		moduleVersion: version
 	])
 }
+
+compileGroovy {
+	groovyOptions.optimizationOptions.indy = true
+}
