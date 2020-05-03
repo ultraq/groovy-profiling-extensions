@@ -39,6 +39,7 @@ dependencies {
 		'org.slf4j:slf4j-api:1.7.29'
 	)
 	testImplementation(
+		'org.slf4j:slf4j-simple:1.7.29',
 		'org.spockframework:spock-core:2.0-M2-groovy-3.0'
 	)
 }
