@@ -31,10 +31,10 @@ API
 These methods are applied as static extensions of the `Object` class, so are
 available everywhere.
 
-### average(String actionName, int samples, int frequency, Closure closure)
+### average(String actionName, int samples, Closure closure)
 
 Log the average time it takes to complete the given closure, using the values of
-the last `samples` executions and emitting a log only after every `frequency`
+the last `samples` executions and emitting a log only after every `samples`
 calls.
 
 ### time(String actionName, Closure closure)
