@@ -71,6 +71,40 @@ class ProfilingExtensions {
 	}
 
 	/**
+	 * The same as {@link #average} but with nanosecond precision.
+	 * 
+	 * @param self
+	 * @param actionName
+	 * @param samples
+	 *   The number of previous executions to include in average calculation.
+	 * @return
+	 */
+	static <T> T averageNanos(Object self, String actionName, int samples, Closure<T> closure) {
+
+		def start = System.nanoTime()
+		def result = closure()
+		def finish = System.nanoTime()
+		def executionTime = finish - start
+
+		def executionTimes = executionTimesPerAction.getOrCreate(actionName) { ->
+			return new ArrayList<Long>(samples)
+		}
+		if (executionTimes.size() == samples) {
+			executionTimes.remove(0)
+		}
+		executionTimes << executionTime
+
+		def executions = (executionsPerAction[actionName] ?: 0) + 1
+		if (executions % samples == 0) {
+			def averageTime = (Long)executionTimes.sum() / executionTimes.size()
+			logger.debug('{} average time: {}ns.', actionName, String.format('%.2f', averageTime))
+		}
+		executionsPerAction[actionName] = executions
+
+		return result
+	}
+
+	/**
 	 * Capture and log the time it takes to perform the given closure.
 	 * 
 	 * @param self
@@ -86,6 +120,26 @@ class ProfilingExtensions {
 
 		def executionTime = finish - start
 		logger.debug('{} complete.  Execution time: {}ms.', actionName, executionTime)
+
+		return result
+	}
+
+	/**
+	 * The same as {@link #time} but with nanosecond precision.
+	 * 
+	 * @param self
+	 * @param actionName
+	 * @param closure
+	 * @return
+	 */
+	static <T> T timeNanos(Object self, String actionName, Closure<T> closure) {
+
+		def start = System.nanoTime()
+		def result = closure()
+		def finish = System.nanoTime()
+
+		def executionTime = finish - start
+		logger.debug('{} complete.  Execution time: {}ns.', actionName, executionTime)
 
 		return result
 	}
@@ -118,6 +172,37 @@ class ProfilingExtensions {
 
 		def averageTime = (Long)executionTimes.sum() / executionTimes.size()
 		logger.debug('{} complete.  Execution time: {}ms.  Average time: {}ms.', actionName, executionTime, String.format('%.2f', averageTime))
+
+		return result
+	}
+
+	/**
+	 * The same as {@link #timeWithAverage} but with nanosecond precision.
+	 * 
+	 * @param self
+	 * @param actionName
+	 * @param samples
+	 *   The number of previous executions to include in average calculation.
+	 * @param closure
+	 * @return
+	 */
+	static <T> T timeWithAverageNanos(Object self, String actionName, int samples, Closure<T> closure) {
+
+		def start = System.nanoTime()
+		def result = closure()
+		def finish = System.nanoTime()
+		def executionTime = finish - start
+
+		def executionTimes = executionTimesPerAction.getOrCreate(actionName) { ->
+			return new ArrayList<Long>(samples)
+		}
+		if (executionTimes.size() == samples) {
+			executionTimes.remove(0)
+		}
+		executionTimes << executionTime
+
+		def averageTime = (Long)executionTimes.sum() / executionTimes.size()
+		logger.debug('{} complete.  Execution time: {}ns.  Average time: {}ns.', actionName, executionTime, String.format('%.2f', averageTime))
 
 		return result
 	}
