@@ -21,8 +21,8 @@ plugins {
 	id 'maven-publish'
 	id 'idea'
 }
-apply from: 'https://raw.githubusercontent.com/ultraq/gradle-support/3.1.2/gradle-support.gradle'
-apply from: 'https://raw.githubusercontent.com/ultraq/gradle-support/3.1.2/maven-publish-support.gradle'
+apply from: 'https://raw.githubusercontent.com/ultraq/gradle-support/3.4.0/gradle-support.gradle'
+apply from: 'https://raw.githubusercontent.com/ultraq/gradle-support/3.4.0/maven-publish-support.gradle'
 
 description = 'A collection of Groovy extensions to aid with profiling an application'
 sourceCompatibility = 1.8
@@ -34,8 +34,8 @@ year     = '2019'
 
 dependencies {
 	implementation(
-		'nz.net.ultraq.extensions:groovy-extensions:1.0.0',
-		'org.codehaus.groovy:groovy:3.0.3',
+		'nz.net.ultraq.extensions:groovy-extensions:1.1.0-SNAPSHOT',
+		'org.codehaus.groovy:groovy:3.0.7',
 		'org.slf4j:slf4j-api:1.7.29'
 	)
 	testImplementation(
