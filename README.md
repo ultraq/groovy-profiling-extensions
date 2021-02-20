@@ -3,7 +3,7 @@ profiling-extensions
 ====================
 
 [![Build Status](https://travis-ci.com/ultraq/profiling-extensions.svg)](https://travis-ci.com/ultraq/profiling-extensions)
-[![Coverage Status](https://coveralls.io/repos/github/ultraq/profiling-extensions/badge.svg?branch=master)](https://coveralls.io/github/ultraq/profiling-extensions?branch=master)
+[![Coverage Status](https://coveralls.io/repos/github/ultraq/profiling-extensions/badge.svg?branch=main)](https://coveralls.io/github/ultraq/profiling-extensions?branch=main)
 [![Maven Central](https://img.shields.io/maven-central/v/nz.net.ultraq.extensions/profiling-extensions.svg?maxAge=3600)](http://search.maven.org/#search|ga|1|g%3A%22nz.net.ultraq.extensions%22%20AND%20a%3A%22profiling-extensions%22)
 
 A collection of Groovy extensions to aid with profiling an application.
@@ -19,7 +19,7 @@ Add a dependency to your project with the following co-ordinates:
 
  - GroupId: `nz.net.ultraq.extensions`
  - ArtifactId: `profiling-extensions`
- - Version: `0.5.0`
+ - Version: `0.6.0-SNAPSHOT`
 
 Check the [project releases](https://github.com/ultraq/profiling-extensions/releases)
 for a list of available versions.
@@ -37,11 +37,17 @@ Log the average time it takes to complete the given closure, using the values of
 the last `samples` executions and emitting a log only after every `samples`
 calls.
 
+Also comes in an `averageNanos` variant which uses nanosecond precision.
+
 ### time(String actionName, Closure closure)
 
 Capture and log the time it takes to perform the given closure.
+
+Also comes in a `timeNanos` variant which uses nanosecond precision
 
 ### timeWithAverage(String actionName, int samples, Closure closure)
 
 Capture and log the time it takes to perform the given closure, and the average
 of the last `samples` executions of the specific action.
+
+Also comes in a `timeWithAverageNanos` variant which uses nanosecond precision.
