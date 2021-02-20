@@ -97,16 +97,8 @@ class ProfilingExtensions {
 	 */
 	static <T> T averageNanos(Object self, String actionName, float seconds, Closure<T> closure) {
 
-		def start = System.nanoTime()
-		def result = closure()
-		def finish = System.nanoTime()
-		def executionTime = finish - start
-
-		def executionTimes = executionTimesPerAction.getOrCreate(actionName) { ->
-			return new ArrayList<Long>()
-		}
-		executionTimes << executionTime
-
+		def result = sampleNanos(actionName, 0, closure)
+		def executionTimes = executionTimesPerAction[actionName]
 		def lastExecutionTime = lastExecutionTimePerAction.getOrCreate(actionName) { ->
 			return System.currentTimeSeconds()
 		}
