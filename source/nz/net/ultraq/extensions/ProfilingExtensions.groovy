@@ -33,6 +33,7 @@ class ProfilingExtensions {
 	private static final Logger logger = LoggerFactory.getLogger(ProfilingExtensions)
 	private static final Map<String,Integer> executionsPerAction = [:]
 	private static final Map<String,List<Long>> executionTimesPerAction = [:]
+	private static final Map<String,Long> lastExecutionTimePerAction = [:]
 
 	/**
 	 * Log the average time it takes to complete the given closure, using the
@@ -47,23 +48,12 @@ class ProfilingExtensions {
 	 */
 	static <T> T average(Object self, String actionName, int samples, Closure<T> closure) {
 
-		def start = System.currentTimeMillis()
-		def result = closure()
-		def finish = System.currentTimeMillis()
-		def executionTime = finish - start
-
-		def executionTimes = executionTimesPerAction.getOrCreate(actionName) { ->
-			return new ArrayList<Long>(samples)
-		}
-		if (executionTimes.size() == samples) {
-			executionTimes.remove(0)
-		}
-		executionTimes << executionTime
+		def result = sample(actionName, samples, closure)
+		def executionTimes = executionTimesPerAction[actionName]
 
 		def executions = (executionsPerAction[actionName] ?: 0) + 1
 		if (executions % samples == 0) {
-			def averageTime = (Long)executionTimes.sum() / executionTimes.size()
-			logger.debug('{} average time: {}ms.', actionName, String.format('%.2f', averageTime))
+			logger.debug('{} average time: {}ms.', actionName, String.format('%.2f', executionTimes.average()))
 		}
 		executionsPerAction[actionName] = executions
 
@@ -81,6 +71,94 @@ class ProfilingExtensions {
 	 */
 	static <T> T averageNanos(Object self, String actionName, int samples, Closure<T> closure) {
 
+		def result = sampleNanos(actionName, samples, closure)
+		def executionTimes = executionTimesPerAction[actionName]
+
+		def executions = (executionsPerAction[actionName] ?: 0) + 1
+		if (executions % samples == 0) {
+			logger.debug('{} average time: {}ns.', actionName, String.format('%.2f', executionTimes.average()))
+		}
+		executionsPerAction[actionName] = executions
+
+		return result
+	}
+
+	/**
+	 * Log the average time it takes to complete the given closure, using the
+	 * values obtained within the last {@code seconds} seconds of execution and
+	 * emitting a log only after samples have been generated for the last
+	 * {@code seconds} seconds.
+	 * 
+	 * @param self
+	 * @param actionName
+	 * @param seconds
+	 * @param closure
+	 * @return
+	 */
+	static <T> T averageNanos(Object self, String actionName, float seconds, Closure<T> closure) {
+
+		def start = System.nanoTime()
+		def result = closure()
+		def finish = System.nanoTime()
+		def executionTime = finish - start
+
+		def executionTimes = executionTimesPerAction.getOrCreate(actionName) { ->
+			return new ArrayList<Long>()
+		}
+		executionTimes << executionTime
+
+		def lastExecutionTime = lastExecutionTimePerAction.getOrCreate(actionName) { ->
+			return System.currentTimeSeconds()
+		}
+
+		def currentExecutionTime = System.currentTimeSeconds()
+		if (currentExecutionTime - lastExecutionTime >= seconds) {
+			logger.debug('{} average time: {}ns.', actionName, String.format('%.2f', executionTimes.average()))
+			lastExecutionTimePerAction[currentExecutionTime]
+			executionTimes.clear()
+		}
+
+		return result
+	}
+
+	/**
+	 * Sample, with millisecond precision, the amount of time it takes to complete
+	 * the given closure.
+	 * 
+	 * @param actionName
+	 * @param samples
+	 * @param closure
+	 * @return
+	 */
+	private static <T> T sample(String actionName, int samples, Closure<T> closure) {
+
+		def start = System.currentTimeMillis()
+		def result = closure()
+		def finish = System.currentTimeMillis()
+		def executionTime = finish - start
+
+		def executionTimes = executionTimesPerAction.getOrCreate(actionName) { ->
+			return new ArrayList<Long>(samples)
+		}
+		if (executionTimes.size() == samples) {
+			executionTimes.remove(0)
+		}
+		executionTimes << executionTime
+
+		return result
+	}
+
+	/**
+	 * Sample, with nanosecond precision, the amount of time it takes to complete
+	 * the given closure.
+	 * 
+	 * @param actionName
+	 * @param samples
+	 * @param closure
+	 * @return
+	 */
+	private static <T> T sampleNanos(String actionName, int samples, Closure<T> closure) {
+
 		def start = System.nanoTime()
 		def result = closure()
 		def finish = System.nanoTime()
@@ -93,13 +171,6 @@ class ProfilingExtensions {
 			executionTimes.remove(0)
 		}
 		executionTimes << executionTime
-
-		def executions = (executionsPerAction[actionName] ?: 0) + 1
-		if (executions % samples == 0) {
-			def averageTime = (Long)executionTimes.sum() / executionTimes.size()
-			logger.debug('{} average time: {}ns.', actionName, String.format('%.2f', averageTime))
-		}
-		executionsPerAction[actionName] = executions
 
 		return result
 	}
@@ -117,8 +188,8 @@ class ProfilingExtensions {
 		def start = System.currentTimeMillis()
 		def result = closure()
 		def finish = System.currentTimeMillis()
-
 		def executionTime = finish - start
+
 		logger.debug('{} complete.  Execution time: {}ms.', actionName, executionTime)
 
 		return result
@@ -137,8 +208,8 @@ class ProfilingExtensions {
 		def start = System.nanoTime()
 		def result = closure()
 		def finish = System.nanoTime()
-
 		def executionTime = finish - start
+
 		logger.debug('{} complete.  Execution time: {}ns.', actionName, executionTime)
 
 		return result
@@ -157,21 +228,12 @@ class ProfilingExtensions {
 	 */
 	static <T> T timeWithAverage(Object self, String actionName, int samples, Closure<T> closure) {
 
-		def start = System.currentTimeMillis()
-		def result = closure()
-		def finish = System.currentTimeMillis()
-		def executionTime = finish - start
-
-		def executionTimes = executionTimesPerAction.getOrCreate(actionName) { ->
-			return new ArrayList<Long>(samples)
-		}
-		if (executionTimes.size() == samples) {
-			executionTimes.remove(0)
-		}
-		executionTimes << executionTime
+		def result = sample(actionName, samples, closure)
+		def executionTimes = executionTimesPerAction[actionName]
 
 		def averageTime = (Long)executionTimes.sum() / executionTimes.size()
-		logger.debug('{} complete.  Execution time: {}ms.  Average time: {}ms.', actionName, executionTime, String.format('%.2f', averageTime))
+		logger.debug('{} complete.  Execution time: {}ms.  Average time: {}ms.',
+			actionName, executionTimes.last(), String.format('%.2f', averageTime))
 
 		return result
 	}
@@ -188,21 +250,11 @@ class ProfilingExtensions {
 	 */
 	static <T> T timeWithAverageNanos(Object self, String actionName, int samples, Closure<T> closure) {
 
-		def start = System.nanoTime()
-		def result = closure()
-		def finish = System.nanoTime()
-		def executionTime = finish - start
+		def result = sampleNanos(actionName, samples, closure)
+		def executionTimes = executionTimesPerAction[actionName]
 
-		def executionTimes = executionTimesPerAction.getOrCreate(actionName) { ->
-			return new ArrayList<Long>(samples)
-		}
-		if (executionTimes.size() == samples) {
-			executionTimes.remove(0)
-		}
-		executionTimes << executionTime
-
-		def averageTime = (Long)executionTimes.sum() / executionTimes.size()
-		logger.debug('{} complete.  Execution time: {}ns.  Average time: {}ns.', actionName, executionTime, String.format('%.2f', averageTime))
+		logger.debug('{} complete.  Execution time: {}ns.  Average time: {}ns.',
+			actionName, executionTimes.last(), String.format('%.2f', executionTimes.sum()))
 
 		return result
 	}
