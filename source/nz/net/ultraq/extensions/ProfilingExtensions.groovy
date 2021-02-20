@@ -114,7 +114,7 @@ class ProfilingExtensions {
 		def currentExecutionTime = System.currentTimeSeconds()
 		if (currentExecutionTime - lastExecutionTime >= seconds) {
 			logger.debug('{} average time: {}ns.', actionName, String.format('%.2f', executionTimes.average()))
-			lastExecutionTimePerAction[currentExecutionTime]
+			lastExecutionTimePerAction[actionName] = currentExecutionTime
 			executionTimes.clear()
 		}
 
