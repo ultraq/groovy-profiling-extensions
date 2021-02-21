@@ -61,6 +61,36 @@ class ProfilingExtensions {
 	}
 
 	/**
+	 * Log the average time it takes to complete the given closure, using the
+	 * values obtained within the last {@code seconds} seconds of execution and
+	 * emitting a log only after samples have been generated for the last
+	 * {@code seconds} seconds.
+	 * 
+	 * @param self
+	 * @param actionName
+	 * @param seconds
+	 * @param closure
+	 * @return
+	 */
+	static <T> T average(Object self, String actionName, float seconds, Closure<T> closure) {
+
+		def result = sample(actionName, 0, closure)
+		def executionTimes = executionTimesPerAction[actionName]
+		def lastExecutionTime = lastExecutionTimePerAction.getOrCreate(actionName) { ->
+			return System.currentTimeSeconds()
+		}
+
+		def currentExecutionTime = System.currentTimeSeconds()
+		if (currentExecutionTime - lastExecutionTime >= seconds) {
+			logger.debug('{} average time: {}ms.', actionName, String.format('%.2f', executionTimes.average()))
+			lastExecutionTimePerAction[actionName] = currentExecutionTime
+			executionTimes.clear()
+		}
+
+		return result
+	}
+
+	/**
 	 * The same as {@link #average} but with nanosecond precision.
 	 * 
 	 * @param self
