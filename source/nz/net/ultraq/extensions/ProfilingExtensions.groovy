@@ -50,6 +50,9 @@ class ProfilingExtensions {
 
 		def result = sample(actionName, samples, closure)
 		def executionTimes = executionTimesPerAction[actionName]
+		if (executionTimes.size() == samples) {
+			executionTimes.remove(0)
+		}
 
 		def executions = (executionsPerAction[actionName] ?: 0) + 1
 		if (executions % samples == 0) {
@@ -103,6 +106,9 @@ class ProfilingExtensions {
 
 		def result = sampleNanos(actionName, samples, closure)
 		def executionTimes = executionTimesPerAction[actionName]
+		if (executionTimes.size() > samples) {
+			executionTimes.remove(0)
+		}
 
 		def executions = (executionsPerAction[actionName] ?: 0) + 1
 		if (executions % samples == 0) {
@@ -162,9 +168,6 @@ class ProfilingExtensions {
 		def executionTimes = executionTimesPerAction.getOrCreate(actionName) { ->
 			return new ArrayList<Long>(samples)
 		}
-		if (executionTimes.size() == samples) {
-			executionTimes.remove(0)
-		}
 		executionTimes << executionTime
 
 		return result
@@ -188,9 +191,6 @@ class ProfilingExtensions {
 
 		def executionTimes = executionTimesPerAction.getOrCreate(actionName) { ->
 			return new ArrayList<Long>(samples)
-		}
-		if (executionTimes.size() == samples) {
-			executionTimes.remove(0)
 		}
 		executionTimes << executionTime
 
@@ -252,6 +252,9 @@ class ProfilingExtensions {
 
 		def result = sample(actionName, samples, closure)
 		def executionTimes = executionTimesPerAction[actionName]
+		if (executionTimes.size() == samples) {
+			executionTimes.remove(0)
+		}
 
 		def averageTime = (Long)executionTimes.sum() / executionTimes.size()
 		logger.debug('{} complete.  Execution time: {}ms.  Average time: {}ms.',
@@ -274,6 +277,9 @@ class ProfilingExtensions {
 
 		def result = sampleNanos(actionName, samples, closure)
 		def executionTimes = executionTimesPerAction[actionName]
+		if (executionTimes.size() > samples) {
+			executionTimes.remove(0)
+		}
 
 		logger.debug('{} complete.  Execution time: {}ns.  Average time: {}ns.',
 			actionName, executionTimes.last(), String.format('%.2f', executionTimes.sum()))
