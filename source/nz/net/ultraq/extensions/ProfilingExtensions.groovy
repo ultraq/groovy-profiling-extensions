@@ -50,7 +50,7 @@ class ProfilingExtensions {
 
 		def result = sample(actionName, samples, closure)
 		def executionTimes = executionTimesPerAction[actionName]
-		if (executionTimes.size() == samples) {
+		if (executionTimes.size() > samples) {
 			executionTimes.remove(0)
 		}
 
@@ -252,13 +252,12 @@ class ProfilingExtensions {
 
 		def result = sample(actionName, samples, closure)
 		def executionTimes = executionTimesPerAction[actionName]
-		if (executionTimes.size() == samples) {
+		if (executionTimes.size() > samples) {
 			executionTimes.remove(0)
 		}
 
-		def averageTime = (Long)executionTimes.sum() / executionTimes.size()
 		logger.debug('{} complete.  Execution time: {}ms.  Average time: {}ms.',
-			actionName, executionTimes.last(), String.format('%.2f', averageTime))
+			actionName, executionTimes.last(), String.format('%.2f', executionTimes.average()))
 
 		return result
 	}
@@ -282,7 +281,7 @@ class ProfilingExtensions {
 		}
 
 		logger.debug('{} complete.  Execution time: {}ns.  Average time: {}ns.',
-			actionName, executionTimes.last(), String.format('%.2f', executionTimes.sum()))
+			actionName, executionTimes.last(), String.format('%.2f', executionTimes.average()))
 
 		return result
 	}

@@ -33,21 +33,57 @@ class ProfilingExtensionsTests extends Specification {
 		GroovyStub(LoggerFactory, global: true).getLogger(_) >> mockLogger
 	}
 
-	def "Logs the time the closure took to execute"() {
+	def "Log the average of all executions after the given number of samples"() {
 		when:
-			time('Test') {
+			average('Test average', 1) {
 				// Nothing happening here
 			}
 		then:
-			_ * mockLogger.debug({ it ==~ /Test complete\.  Execution time: [\d]+ms\./ })
+			_ * mockLogger.debug({ it ==~ /Test average average time: \d+\.\d{2}ms./ })
+	}
+
+	def "Log the average of all executions after the given number of samples - nanosecond precision"() {
+		when:
+			averageNanos('Test averageNanos', 1) {
+				// Nothing happening here
+			}
+		then:
+			_ * mockLogger.debug({ it ==~ /Test averageNanos average time: \d+\.\d{2}ns./ })
+	}
+
+	def "Logs the time the closure took to execute"() {
+		when:
+			time('Test time') {
+				// Nothing happening here
+			}
+		then:
+			_ * mockLogger.debug({ it ==~ /Test time complete\.  Execution time: \d+ms\./ })
+	}
+
+	def "Logs the time the closure took to execute - nanosecond precision"() {
+		when:
+			timeNanos('Test timeNanos') {
+				// Nothing happening here
+			}
+		then:
+			_ * mockLogger.debug({ it ==~ /Test timeNanos complete\.  Execution time: \d+ns\./ })
 	}
 
 	def "Logs the current and average time the closure took to execute"() {
 		when:
-			timeWithAverage('Test for average', 1) {
+			timeWithAverage('Test timeWithAverage', 1) {
 				// Nothing happening here
 			}
 		then:
-			_ * mockLogger.debug({ it ==~ /Test for average complete\.  Execution time: [\d]+ms\.  Average time: [\d]+.\d\dms\./ })
+			_ * mockLogger.debug({ it ==~ /Test timeWithAverage complete\.  Execution time: \d+ms\.  Average time: \d+\.\d{2}ms\./ })
+	}
+
+	def "Logs the current and average time the closure took to execute - nanosecond precision"() {
+		when:
+			timeWithAverageNanos('Test timeWithAverageNanos', 1) {
+				// Nothing happening here
+			}
+		then:
+			_ * mockLogger.debug({ it ==~ /Test timeWithAverageNanos complete\.  Execution time: \d+ns\.  Average time: \d+.d{2}ns\./ })
 	}
 }
