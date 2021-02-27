@@ -36,10 +36,10 @@ dependencies {
 	implementation(
 		'nz.net.ultraq.extensions:groovy-extensions:1.1.0-SNAPSHOT',
 		'org.codehaus.groovy:groovy:3.0.7',
-		'org.slf4j:slf4j-api:1.7.29'
+		'org.slf4j:slf4j-api:1.7.30'
 	)
 	testImplementation(
-		'org.slf4j:slf4j-simple:1.7.29',
+		'org.slf4j:slf4j-simple:1.7.30',
 		'org.spockframework:spock-core:2.0-M2-groovy-3.0'
 	)
 }
