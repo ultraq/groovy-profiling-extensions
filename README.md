@@ -39,6 +39,14 @@ calls.
 
 Also comes in an `averageNanos` variant which uses nanosecond precision.
 
+### average(String actionName, float seconds, Logger logger, Closure closure)
+
+Log the average time it takes to complete the given closure, using the values
+obtained within the last `seconds` seconds of execution and emitting a log only
+after samples have been generated for the last `seconds` seconds.
+
+Also comes in an `averageNanos` variant which uses nanosecond precision.
+
 ### time(String actionName, Logger logger, Closure closure)
 
 Capture and log the time it takes to perform the given closure.
