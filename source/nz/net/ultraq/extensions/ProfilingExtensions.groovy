@@ -17,7 +17,6 @@
 package nz.net.ultraq.extensions
 
 import org.slf4j.Logger
-import org.slf4j.LoggerFactory
 
 import groovy.transform.CompileStatic
 
@@ -30,7 +29,6 @@ import groovy.transform.CompileStatic
 @CompileStatic
 class ProfilingExtensions {
 
-	private static final Logger logger = LoggerFactory.getLogger(ProfilingExtensions)
 	private static final Map<String,Integer> executionsPerAction = [:]
 	private static final Map<String,List<Long>> executionTimesPerAction = [:]
 	private static final Map<String,Long> lastExecutionTimePerAction = [:]
@@ -44,9 +42,11 @@ class ProfilingExtensions {
 	 * @param actionName
 	 * @param samples
 	 *   The number of previous executions to include in average calculation.
+	 * @param logger
+	 * @param closure
 	 * @return
 	 */
-	static <T> T average(Object self, String actionName, int samples, Closure<T> closure) {
+	static <T> T average(Object self, String actionName, int samples, Logger logger, Closure<T> closure) {
 
 		def result = sample(actionName, samples, closure)
 		def executionTimes = executionTimesPerAction[actionName]
@@ -72,10 +72,11 @@ class ProfilingExtensions {
 	 * @param self
 	 * @param actionName
 	 * @param seconds
+	 * @param logger
 	 * @param closure
 	 * @return
 	 */
-	static <T> T average(Object self, String actionName, float seconds, Closure<T> closure) {
+	static <T> T average(Object self, String actionName, float seconds, Logger logger, Closure<T> closure) {
 
 		def result = sample(actionName, 0, closure)
 		def executionTimes = executionTimesPerAction[actionName]
@@ -100,9 +101,11 @@ class ProfilingExtensions {
 	 * @param actionName
 	 * @param samples
 	 *   The number of previous executions to include in average calculation.
+	 * @param logger
+	 * @param closure
 	 * @return
 	 */
-	static <T> T averageNanos(Object self, String actionName, int samples, Closure<T> closure) {
+	static <T> T averageNanos(Object self, String actionName, int samples, Logger logger, Closure<T> closure) {
 
 		def result = sampleNanos(actionName, samples, closure)
 		def executionTimes = executionTimesPerAction[actionName]
@@ -128,10 +131,11 @@ class ProfilingExtensions {
 	 * @param self
 	 * @param actionName
 	 * @param seconds
+	 * @param logger
 	 * @param closure
 	 * @return
 	 */
-	static <T> T averageNanos(Object self, String actionName, float seconds, Closure<T> closure) {
+	static <T> T averageNanos(Object self, String actionName, float seconds, Logger logger, Closure<T> closure) {
 
 		def result = sampleNanos(actionName, 0, closure)
 		def executionTimes = executionTimesPerAction[actionName]
@@ -203,9 +207,10 @@ class ProfilingExtensions {
 	 * @param self
 	 * @param actionName
 	 * @param closure
+	 * @param logger
 	 * @return
 	 */
-	static <T> T time(Object self, String actionName, Closure<T> closure) {
+	static <T> T time(Object self, String actionName, Logger logger, Closure<T> closure) {
 
 		def start = System.currentTimeMillis()
 		def result = closure()
@@ -222,10 +227,11 @@ class ProfilingExtensions {
 	 * 
 	 * @param self
 	 * @param actionName
+	 * @param logger
 	 * @param closure
 	 * @return
 	 */
-	static <T> T timeNanos(Object self, String actionName, Closure<T> closure) {
+	static <T> T timeNanos(Object self, String actionName, Logger logger, Closure<T> closure) {
 
 		def start = System.nanoTime()
 		def result = closure()
@@ -245,10 +251,11 @@ class ProfilingExtensions {
 	 * @param actionName
 	 * @param samples
 	 *   The number of previous executions to include in average calculation.
+	 * @param logger
 	 * @param closure
 	 * @return
 	 */
-	static <T> T timeWithAverage(Object self, String actionName, int samples, Closure<T> closure) {
+	static <T> T timeWithAverage(Object self, String actionName, int samples, Logger logger, Closure<T> closure) {
 
 		def result = sample(actionName, samples, closure)
 		def executionTimes = executionTimesPerAction[actionName]
@@ -269,10 +276,11 @@ class ProfilingExtensions {
 	 * @param actionName
 	 * @param samples
 	 *   The number of previous executions to include in average calculation.
+	 * @param logger
 	 * @param closure
 	 * @return
 	 */
-	static <T> T timeWithAverageNanos(Object self, String actionName, int samples, Closure<T> closure) {
+	static <T> T timeWithAverageNanos(Object self, String actionName, int samples, Logger logger, Closure<T> closure) {
 
 		def result = sampleNanos(actionName, samples, closure)
 		def executionTimes = executionTimesPerAction[actionName]

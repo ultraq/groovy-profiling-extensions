@@ -31,7 +31,7 @@ API
 These methods are applied as static extensions of the `Object` class, so are
 available everywhere.
 
-### average(String actionName, int samples, Closure closure)
+### average(String actionName, int samples, Logger logger, Closure closure)
 
 Log the average time it takes to complete the given closure, using the values of
 the last `samples` executions and emitting a log only after every `samples`
@@ -39,13 +39,13 @@ calls.
 
 Also comes in an `averageNanos` variant which uses nanosecond precision.
 
-### time(String actionName, Closure closure)
+### time(String actionName, Logger logger, Closure closure)
 
 Capture and log the time it takes to perform the given closure.
 
 Also comes in a `timeNanos` variant which uses nanosecond precision
 
-### timeWithAverage(String actionName, int samples, Closure closure)
+### timeWithAverage(String actionName, int samples, Logger logger, Closure closure)
 
 Capture and log the time it takes to perform the given closure, and the average
 of the last `samples` executions of the specific action.

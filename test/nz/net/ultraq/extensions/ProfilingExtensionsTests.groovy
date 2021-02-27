@@ -17,7 +17,6 @@
 package nz.net.ultraq.extensions
 
 import org.slf4j.Logger
-import org.slf4j.LoggerFactory
 import spock.lang.Specification
 
 /**
@@ -27,63 +26,101 @@ import spock.lang.Specification
  */
 class ProfilingExtensionsTests extends Specification {
 
-	def mockLogger
-	def setup() {
-		mockLogger = Mock(Logger)
-		GroovyStub(LoggerFactory, global: true).getLogger(_) >> mockLogger
-	}
+	def logger = Mock(Logger)
 
 	def "Log the average of all executions after the given number of samples"() {
+		given:
+			def actionName = 'Test average'
+			def samples = 2
+			def profiledAction = {
+				average(actionName, samples, logger) {
+					// Nothing happening here
+				}
+			}
 		when:
-			average('Test average', 1) {
-				// Nothing happening here
+			samples.times {
+				profiledAction()
 			}
 		then:
-			_ * mockLogger.debug({ it ==~ /Test average average time: \d+\.\d{2}ms./ })
+			1 * logger.debug('{} average time: {}ms.', actionName, { it ==~ /\d+\.\d{2}/ })
 	}
 
 	def "Log the average of all executions after the given number of samples - nanosecond precision"() {
+		given:
+			def actionName = 'Test averageNanos'
+			def samples = 2
+			def profiledAction = {
+				averageNanos(actionName, samples, logger) {
+					// Nothing happening here
+				}
+			}
 		when:
-			averageNanos('Test averageNanos', 1) {
-				// Nothing happening here
+			samples.times {
+				profiledAction()
 			}
 		then:
-			_ * mockLogger.debug({ it ==~ /Test averageNanos average time: \d+\.\d{2}ns./ })
+			1 * logger.debug('{} average time: {}ns.', actionName, { it ==~ /\d+\.\d{2}/ })
 	}
 
 	def "Logs the time the closure took to execute"() {
-		when:
-			time('Test time') {
-				// Nothing happening here
+		given:
+			def actionName = 'Test time'
+			def profiledAction = {
+				time(actionName, logger) {
+					// Nothing happening here
+				}
 			}
+		when:
+			profiledAction()
 		then:
-			_ * mockLogger.debug({ it ==~ /Test time complete\.  Execution time: \d+ms\./ })
+			1 * logger.debug('{} complete.  Execution time: {}ms.', actionName, _ as Long)
 	}
 
 	def "Logs the time the closure took to execute - nanosecond precision"() {
-		when:
-			timeNanos('Test timeNanos') {
-				// Nothing happening here
+		given:
+			def actionName = 'Test timeNanos'
+			def profiledAction = {
+				timeNanos(actionName, logger) {
+					// Nothing happening here
+				}
 			}
+		when:
+			profiledAction()
 		then:
-			_ * mockLogger.debug({ it ==~ /Test timeNanos complete\.  Execution time: \d+ns\./ })
+			1 * logger.debug('{} complete.  Execution time: {}ns.', actionName, _ as Long)
 	}
 
 	def "Logs the current and average time the closure took to execute"() {
+		given:
+			def actionName = 'Test timeWithAverage'
+			def samples = 2
+			def profiledAction = {
+				timeWithAverage(actionName, samples, logger) {
+					// Nothing happening here
+				}
+			}
 		when:
-			timeWithAverage('Test timeWithAverage', 1) {
-				// Nothing happening here
+			samples.times {
+				profiledAction()
 			}
 		then:
-			_ * mockLogger.debug({ it ==~ /Test timeWithAverage complete\.  Execution time: \d+ms\.  Average time: \d+\.\d{2}ms\./ })
+			2 * logger.debug('{} complete.  Execution time: {}ms.  Average time: {}ms.', actionName, _ as Long, { it ==~ /\d+\.\d{2}/ })
 	}
 
 	def "Logs the current and average time the closure took to execute - nanosecond precision"() {
+		given:
+			def actionName = 'Test timeWithAverageNanos'
+			def samples = 2
+			def profiledAction = {
+				timeWithAverageNanos(actionName, samples, logger) {
+					// Nothing happening here
+				}
+			}
 		when:
-			timeWithAverageNanos('Test timeWithAverageNanos', 1) {
-				// Nothing happening here
+			samples.times {
+				profiledAction()
 			}
 		then:
-			_ * mockLogger.debug({ it ==~ /Test timeWithAverageNanos complete\.  Execution time: \d+ns\.  Average time: \d+.d{2}ns\./ })
+			2 * logger.debug('{} complete.  Execution time: {}ns.  Average time: {}ns.', actionName, _ as Long, { it ==~ /\d+\.\d{2}/ })
 	}
 }
