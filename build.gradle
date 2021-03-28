@@ -34,7 +34,7 @@ year     = '2019'
 
 dependencies {
 	implementation(
-		'nz.net.ultraq.extensions:groovy-extensions:1.1.0-SNAPSHOT',
+		'nz.net.ultraq.extensions:groovy-extensions:1.0.0',
 		'org.codehaus.groovy:groovy:3.0.7',
 		'org.slf4j:slf4j-api:1.7.30'
 	)
