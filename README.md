@@ -13,13 +13,13 @@ Installation
 ------------
 
 Minimum of Java 8 required.  Logging is done via [SLF4J](http://www.slf4j.org/),
-so some implementation of it is needed to be able to view the logs later.
+so some implementation of it is needed to pass to the methods to emit logs.
 
 Add a dependency to your project with the following co-ordinates:
 
  - GroupId: `nz.net.ultraq.extensions`
  - ArtifactId: `profiling-extensions`
- - Version: `0.6.0-SNAPSHOT`
+ - Version: `0.6.0`
 
 Check the [project releases](https://github.com/ultraq/profiling-extensions/releases)
 for a list of available versions.
