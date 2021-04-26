@@ -29,18 +29,18 @@ sourceCompatibility = 1.8
 
 group    = 'nz.net.ultraq.extensions'
 artifact = 'profiling-extensions'
-version  = '0.6.0'
+version  = '0.7.0-SNAPSHOT'
 year     = '2019'
 
 dependencies {
 	implementation(
 		'nz.net.ultraq.extensions:groovy-extensions:1.0.0',
-		'org.codehaus.groovy:groovy:3.0.7',
+		'org.codehaus.groovy:groovy:3.0.8',
 		'org.slf4j:slf4j-api:1.7.30'
 	)
 	testImplementation(
 		'org.slf4j:slf4j-simple:1.7.30',
-		'org.spockframework:spock-core:2.0-M2-groovy-3.0'
+		'org.spockframework:spock-core:2.0-M5-groovy-3.0'
 	)
 }
 

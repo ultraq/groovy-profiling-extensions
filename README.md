@@ -19,7 +19,7 @@ Add a dependency to your project with the following co-ordinates:
 
  - GroupId: `nz.net.ultraq.extensions`
  - ArtifactId: `profiling-extensions`
- - Version: `0.6.0`
+ - Version: `0.7.0-SNAPSHOT`
 
 Check the [project releases](https://github.com/ultraq/profiling-extensions/releases)
 for a list of available versions.
@@ -47,11 +47,17 @@ after samples have been generated for the last `seconds` seconds.
 
 Also comes in an `averageNanos` variant which uses nanosecond precision.
 
+### time(Closure closure)
+
+Capture and return the time it takes to perform the given closure.
+
+Also comes in a `timeNanos` variant which uses nanosecond precision.
+
 ### time(String actionName, Logger logger, Closure closure)
 
 Capture and log the time it takes to perform the given closure.
 
-Also comes in a `timeNanos` variant which uses nanosecond precision
+Also comes in a `timeNanos` variant which uses nanosecond precision.
 
 ### timeWithAverage(String actionName, int samples, Logger logger, Closure closure)
 

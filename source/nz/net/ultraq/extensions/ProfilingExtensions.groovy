@@ -45,6 +45,7 @@ class ProfilingExtensions {
 	 * @param logger
 	 * @param closure
 	 * @return
+	 *   The value returned from the closure.
 	 */
 	static <T> T average(Object self, String actionName, int samples, Logger logger, Closure<T> closure) {
 
@@ -75,6 +76,7 @@ class ProfilingExtensions {
 	 * @param logger
 	 * @param closure
 	 * @return
+	 *   The value returned from the closure.
 	 */
 	static <T> T average(Object self, String actionName, float seconds, Logger logger, Closure<T> closure) {
 
@@ -104,6 +106,7 @@ class ProfilingExtensions {
 	 * @param logger
 	 * @param closure
 	 * @return
+	 *   The value returned from the closure.
 	 */
 	static <T> T averageNanos(Object self, String actionName, int samples, Logger logger, Closure<T> closure) {
 
@@ -134,6 +137,7 @@ class ProfilingExtensions {
 	 * @param logger
 	 * @param closure
 	 * @return
+	 *   The value returned from the closure.
 	 */
 	static <T> T averageNanos(Object self, String actionName, float seconds, Logger logger, Closure<T> closure) {
 
@@ -161,6 +165,7 @@ class ProfilingExtensions {
 	 * @param samples
 	 * @param closure
 	 * @return
+	 *   The value returned from the closure.
 	 */
 	private static <T> T sample(String actionName, int samples, Closure<T> closure) {
 
@@ -185,6 +190,7 @@ class ProfilingExtensions {
 	 * @param samples
 	 * @param closure
 	 * @return
+	 *   The value returned from the closure.
 	 */
 	private static <T> T sampleNanos(String actionName, int samples, Closure<T> closure) {
 
@@ -202,6 +208,38 @@ class ProfilingExtensions {
 	}
 
 	/**
+	 * Capture and return the time it takes to perform the given closure.
+	 * 
+	 * @param self
+	 * @param closure
+	 * @return
+	 *   The time the closure took, in milliseconds, to complete.
+	 */
+	static long time(Object self, Closure closure) {
+
+		def start = System.currentTimeMillis()
+		closure()
+		def finish = System.currentTimeMillis()
+		return finish - start
+	}
+
+	/**
+	 * Capture and return the time it takes to perform the given closure.
+	 * 
+	 * @param self
+	 * @param closure
+	 * @return
+	 *   The time the closure took, in nanoseconds, to complete.
+	 */
+	static long timeNanos(Object self, Closure closure) {
+
+		def start = System.nanoTime()
+		closure()
+		def finish = System.nanoTime()
+		return finish - start
+	}
+
+	/**
 	 * Capture and log the time it takes to perform the given closure.
 	 * 
 	 * @param self
@@ -209,6 +247,7 @@ class ProfilingExtensions {
 	 * @param closure
 	 * @param logger
 	 * @return
+	 *   The value returned from the closure.
 	 */
 	static <T> T time(Object self, String actionName, Logger logger, Closure<T> closure) {
 
@@ -230,6 +269,7 @@ class ProfilingExtensions {
 	 * @param logger
 	 * @param closure
 	 * @return
+	 *   The value returned from the closure.
 	 */
 	static <T> T timeNanos(Object self, String actionName, Logger logger, Closure<T> closure) {
 
@@ -254,6 +294,7 @@ class ProfilingExtensions {
 	 * @param logger
 	 * @param closure
 	 * @return
+	 *   The value returned from the closure.
 	 */
 	static <T> T timeWithAverage(Object self, String actionName, int samples, Logger logger, Closure<T> closure) {
 
@@ -279,6 +320,7 @@ class ProfilingExtensions {
 	 * @param logger
 	 * @param closure
 	 * @return
+	 *   The value returned from the closure.
 	 */
 	static <T> T timeWithAverageNanos(Object self, String actionName, int samples, Logger logger, Closure<T> closure) {
 
