@@ -2,7 +2,7 @@
 profiling-extensions
 ====================
 
-[![Build Status](https://travis-ci.com/ultraq/profiling-extensions.svg)](https://travis-ci.com/ultraq/profiling-extensions)
+[![Build Status](https://github.com/ultraq/profiling-extensions/actions/workflows/build.yml/badge.svg)](https://github.com/ultraq/profiling-extensions/actions)
 [![Coverage Status](https://coveralls.io/repos/github/ultraq/profiling-extensions/badge.svg?branch=main)](https://coveralls.io/github/ultraq/profiling-extensions?branch=main)
 [![Maven Central](https://img.shields.io/maven-central/v/nz.net.ultraq.extensions/profiling-extensions.svg?maxAge=3600)](http://search.maven.org/#search|ga|1|g%3A%22nz.net.ultraq.extensions%22%20AND%20a%3A%22profiling-extensions%22)
 
