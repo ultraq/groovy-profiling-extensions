@@ -19,7 +19,7 @@ Add a dependency to your project with the following co-ordinates:
 
  - GroupId: `nz.net.ultraq.extensions`
  - ArtifactId: `profiling-extensions`
- - Version: `0.7.0-SNAPSHOT`
+ - Version: `0.6.1`
 
 Check the [project releases](https://github.com/ultraq/profiling-extensions/releases)
 for a list of available versions.
