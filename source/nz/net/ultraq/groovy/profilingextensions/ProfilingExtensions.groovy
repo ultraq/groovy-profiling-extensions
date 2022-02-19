@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package nz.net.ultraq.extensions.profiling
+package nz.net.ultraq.groovy.profilingextensions
 
 import org.slf4j.Logger
 

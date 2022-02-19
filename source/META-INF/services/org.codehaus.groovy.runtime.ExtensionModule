@@ -16,4 +16,4 @@
 
 moduleName = profiling-extensions
 moduleVersion = ${moduleVersion}
-staticExtensionClasses = nz.net.ultraq.extensions.profiling.ProfilingExtensions
+staticExtensionClasses = nz.net.ultraq.groovy.profilingextensions.ProfilingExtensions

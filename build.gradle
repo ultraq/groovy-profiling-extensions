@@ -29,12 +29,12 @@ sourceCompatibility = 1.8
 
 group    = 'nz.net.ultraq.extensions'
 artifact = 'profiling-extensions'
-version  = '0.6.1'
+version  = '0.7.0-SNAPSHOT'
 year     = '2019'
 
 dependencies {
 	implementation(
-		'nz.net.ultraq.extensions:groovy-extensions:1.1.0',
+		'nz.net.ultraq.groovy:groovy-extensions:2.0.0-SNAPSHOT',
 		'org.codehaus.groovy:groovy:3.0.8',
 		'org.slf4j:slf4j-api:1.7.32'
 	)
@@ -60,6 +60,6 @@ test {
 
 jar {
 	manifest {
-		attributes('Automatic-Module-Name': 'nz.net.ultraq.extensions.profiling')
+		attributes('Automatic-Module-Name': 'nz.net.ultraq.groovy.profilingextensions')
 	}
 }

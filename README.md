@@ -1,10 +1,10 @@
 
-profiling-extensions
-====================
+groovy-profiling-extensions
+===========================
 
-[![Build Status](https://github.com/ultraq/profiling-extensions/actions/workflows/build.yml/badge.svg)](https://github.com/ultraq/profiling-extensions/actions)
+[![Build Status](https://github.com/ultraq/groovy-profiling-extensions/actions/workflows/build.yml/badge.svg)](https://github.com/ultraq/groovy-profiling-extensions/actions)
 [![Coverage Status](https://coveralls.io/repos/github/ultraq/profiling-extensions/badge.svg?branch=main)](https://coveralls.io/github/ultraq/profiling-extensions?branch=main)
-[![Maven Central](https://img.shields.io/maven-central/v/nz.net.ultraq.extensions/profiling-extensions.svg?maxAge=3600)](http://search.maven.org/#search|ga|1|g%3A%22nz.net.ultraq.extensions%22%20AND%20a%3A%22profiling-extensions%22)
+[![Maven Central](https://img.shields.io/maven-central/v/nz.net.ultraq.groovy/groovy-profiling-extensions.svg?maxAge=3600)](http://search.maven.org/#search|ga|1|g%3A%22nz.net.ultraq.groovy%22%20AND%20a%3A%22groovy-profiling-extensions%22)
 
 A collection of Groovy extensions to aid with profiling an application.
 
@@ -17,11 +17,11 @@ so some implementation of it is needed to pass to the methods to emit logs.
 
 Add a dependency to your project with the following co-ordinates:
 
- - GroupId: `nz.net.ultraq.extensions`
- - ArtifactId: `profiling-extensions`
+ - GroupId: `nz.net.ultraq.groovy`
+ - ArtifactId: `groovy-profiling-extensions`
  - Version: `0.6.1`
 
-Check the [project releases](https://github.com/ultraq/profiling-extensions/releases)
+Check the [project releases](https://github.com/ultraq/groovy-profiling-extensions/releases)
 for a list of available versions.
 
 
