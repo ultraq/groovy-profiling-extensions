@@ -14,6 +14,6 @@
 # limitations under the License.
 # 
 
-moduleName = profiling-extensions
+moduleName = groovy-profiling-extensions
 moduleVersion = ${moduleVersion}
 staticExtensionClasses = nz.net.ultraq.groovy.profilingextensions.ProfilingExtensions
