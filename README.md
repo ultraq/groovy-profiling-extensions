@@ -3,7 +3,7 @@ groovy-profiling-extensions
 ===========================
 
 [![Build Status](https://github.com/ultraq/groovy-profiling-extensions/actions/workflows/build.yml/badge.svg)](https://github.com/ultraq/groovy-profiling-extensions/actions)
-[![Coverage Status](https://coveralls.io/repos/github/ultraq/profiling-extensions/badge.svg?branch=main)](https://coveralls.io/github/ultraq/profiling-extensions?branch=main)
+[![codecov](https://codecov.io/gh/ultraq/groovy-profiling-extensions/branch/main/graph/badge.svg?token=FOLRRS9CNJ)](https://codecov.io/gh/ultraq/groovy-profiling-extensions)
 [![Maven Central](https://img.shields.io/maven-central/v/nz.net.ultraq.groovy/groovy-profiling-extensions.svg?maxAge=3600)](http://search.maven.org/#search|ga|1|g%3A%22nz.net.ultraq.groovy%22%20AND%20a%3A%22groovy-profiling-extensions%22)
 
 A collection of Groovy extensions to aid with profiling an application.
