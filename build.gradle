@@ -17,41 +17,25 @@
 plugins {
 	id 'groovy'
 	id 'jacoco'
-	id 'com.github.kt3k.coveralls' version '2.10.1'
 	id 'maven-publish'
 	id 'idea'
 }
-apply from: 'https://raw.githubusercontent.com/ultraq/gradle-support/3.4.0/gradle-support.gradle'
-apply from: 'https://raw.githubusercontent.com/ultraq/gradle-support/3.4.0/maven-publish-support.gradle'
+apply from: 'https://raw.githubusercontent.com/ultraq/gradle-support/4.0.0/gradle-support.gradle'
+apply from: 'https://raw.githubusercontent.com/ultraq/gradle-support/4.0.0/maven-publish-support.gradle'
 
 description = 'A collection of Groovy extensions to aid with profiling an application'
-sourceCompatibility = 1.8
-
-group    = 'nz.net.ultraq.extensions'
-artifact = 'profiling-extensions'
 version  = '0.7.0-SNAPSHOT'
-year     = '2019'
+sourceCompatibility = 1.8
+group = 'nz.net.ultraq.groovy'
+year = '2019'
 
 dependencies {
-	implementation(
-		'nz.net.ultraq.groovy:groovy-extensions:2.0.0-SNAPSHOT',
-		'org.codehaus.groovy:groovy:3.0.8',
-		'org.slf4j:slf4j-api:1.7.32'
-	)
-	testImplementation(
-		'org.slf4j:slf4j-simple:1.7.32',
-		'org.spockframework:spock-core:2.0-groovy-3.0'
-	)
-}
+	implementation 'nz.net.ultraq.groovy:groovy-extensions:2.0.0-SNAPSHOT'
+	implementation 'org.apache.groovy:groovy:4.0.0'
+	implementation 'org.slf4j:slf4j-api:1.7.36'
 
-processResources {
-	expand([
-		moduleVersion: version
-	])
-}
-
-compileGroovy {
-	groovyOptions.optimizationOptions.indy = true
+	testImplementation 'org.slf4j:slf4j-simple:1.7.36'
+	testImplementation 'org.spockframework:spock-core:2.2-M1-groovy-4.0'
 }
 
 test {
