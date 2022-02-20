@@ -28,40 +28,5 @@ for a list of available versions.
 API
 ---
 
-These methods are applied as static extensions of the `Object` class, so are
-available everywhere.
-
-### average(String actionName, int samples, Logger logger, Closure closure)
-
-Log the average time it takes to complete the given closure, using the values of
-the last `samples` executions and emitting a log only after every `samples`
-calls.
-
-Also comes in an `averageNanos` variant which uses nanosecond precision.
-
-### average(String actionName, float seconds, Logger logger, Closure closure)
-
-Log the average time it takes to complete the given closure, using the values
-obtained within the last `seconds` seconds of execution and emitting a log only
-after samples have been generated for the last `seconds` seconds.
-
-Also comes in an `averageNanos` variant which uses nanosecond precision.
-
-### time(Closure closure)
-
-Capture and return the time it takes to perform the given closure.
-
-Also comes in a `timeNanos` variant which uses nanosecond precision.
-
-### time(String actionName, Logger logger, Closure closure)
-
-Capture and log the time it takes to perform the given closure.
-
-Also comes in a `timeNanos` variant which uses nanosecond precision.
-
-### timeWithAverage(String actionName, int samples, Logger logger, Closure closure)
-
-Capture and log the time it takes to perform the given closure, and the average
-of the last `samples` executions of the specific action.
-
-Also comes in a `timeWithAverageNanos` variant which uses nanosecond precision.
+Browse the online groovydocs for the available extension methods here:
+https://javadoc.io/doc/nz.net.ultraq.groovy/groovy-profiling-extensions

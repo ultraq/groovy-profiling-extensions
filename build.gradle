@@ -20,8 +20,8 @@ plugins {
 	id 'maven-publish'
 	id 'idea'
 }
-apply from: 'https://raw.githubusercontent.com/ultraq/gradle-support/4.0.0/gradle-support.gradle'
-apply from: 'https://raw.githubusercontent.com/ultraq/gradle-support/4.0.0/maven-publish-support.gradle'
+apply from: 'https://raw.githubusercontent.com/ultraq/gradle-support/4.0.1/gradle-support.gradle'
+apply from: 'https://raw.githubusercontent.com/ultraq/gradle-support/4.0.1/maven-publish-support.gradle'
 
 description = 'A collection of Groovy extensions to aid with profiling an application'
 version  = '0.7.0-SNAPSHOT'
@@ -40,6 +40,10 @@ dependencies {
 
 test {
 	useJUnitPlatform()
+}
+
+groovydoc {
+	link('https://www.slf4j.org/apidocs/', 'org.slf4j.')
 }
 
 jar {
