@@ -262,7 +262,7 @@ class ProfilingExtensions {
 	}
 
 	/**
-	 * The same as {@link #time} but with nanosecond precision.
+	 * The same as {@link #time(Object, String, Logger, Closure)} but with nanosecond precision.
 	 * 
 	 * @param self
 	 * @param actionName

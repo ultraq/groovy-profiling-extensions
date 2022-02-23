@@ -28,7 +28,7 @@ class ProfilingExtensionsTests extends Specification {
 
 	def logger = Mock(Logger)
 
-	def "Log the average of all executions after the given number of samples"() {
+	def "#average - Log the average of all executions after the given number of samples"() {
 		given:
 			def actionName = 'Test average'
 			def samples = 2
@@ -45,7 +45,7 @@ class ProfilingExtensionsTests extends Specification {
 			1 * logger.debug('{} average time: {}ms.', actionName, { it ==~ /\d+\.\d{2}/ })
 	}
 
-	def "Log the average of all executions after the given number of samples - nanosecond precision"() {
+	def "#averageNanos - Log the average of all executions after the given number of samples"() {
 		given:
 			def actionName = 'Test averageNanos'
 			def samples = 2
@@ -62,35 +62,37 @@ class ProfilingExtensionsTests extends Specification {
 			1 * logger.debug('{} average time: {}ns.', actionName, { it ==~ /\d+\.\d{2}/ })
 	}
 
-	def "Logs the time the closure took to execute"() {
+	def "#time - Logs the time the closure took to execute, returning its result"() {
 		given:
 			def actionName = 'Test time'
 			def profiledAction = {
 				time(actionName, logger) {
-					// Nothing happening here
+					return 'Hi!'
 				}
 			}
 		when:
-			profiledAction()
+			def result = profiledAction()
 		then:
 			1 * logger.debug('{} complete.  Execution time: {}ms.', actionName, _ as Long)
+			result == 'Hi!'
 	}
 
-	def "Logs the time the closure took to execute - nanosecond precision"() {
+	def "#timeNanos - Logs the time the closure took to execute, returning its result"() {
 		given:
 			def actionName = 'Test timeNanos'
 			def profiledAction = {
 				timeNanos(actionName, logger) {
-					// Nothing happening here
+					return 'Hi!'
 				}
 			}
 		when:
-			profiledAction()
+			def result = profiledAction()
 		then:
 			1 * logger.debug('{} complete.  Execution time: {}ns.', actionName, _ as Long)
+			result == 'Hi!'
 	}
 
-	def "Logs the current and average time the closure took to execute"() {
+	def "#timeWithAverage - Logs the current and average time the closure took to execute"() {
 		given:
 			def actionName = 'Test timeWithAverage'
 			def samples = 2
@@ -107,7 +109,7 @@ class ProfilingExtensionsTests extends Specification {
 			2 * logger.debug('{} complete.  Execution time: {}ms.  Average time: {}ms.', actionName, _ as Long, { it ==~ /\d+\.\d{2}/ })
 	}
 
-	def "Logs the current and average time the closure took to execute - nanosecond precision"() {
+	def "#timeWithAverageNanos - Logs the current and average time the closure took to execute"() {
 		given:
 			def actionName = 'Test timeWithAverageNanos'
 			def samples = 2
