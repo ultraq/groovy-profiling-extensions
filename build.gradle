@@ -30,7 +30,7 @@ group = 'nz.net.ultraq.groovy'
 year = '2019'
 
 dependencies {
-	implementation 'nz.net.ultraq.groovy:groovy-extensions:2.0.0-SNAPSHOT'
+	implementation 'nz.net.ultraq.groovy:groovy-extensions:2.0.0'
 	implementation 'org.apache.groovy:groovy:4.0.0'
 	implementation 'org.slf4j:slf4j-api:1.7.36'
 
