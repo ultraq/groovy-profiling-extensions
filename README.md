@@ -19,7 +19,7 @@ Add a dependency to your project with the following co-ordinates:
 
  - GroupId: `nz.net.ultraq.groovy`
  - ArtifactId: `groovy-profiling-extensions`
- - Version: `0.7.0`
+ - Version: `0.8.0`
 
 Check the [project releases](https://github.com/ultraq/groovy-profiling-extensions/releases)
 for a list of available versions.

@@ -20,22 +20,26 @@ plugins {
 	id 'maven-publish'
 	id 'idea'
 }
-apply from: 'https://raw.githubusercontent.com/ultraq/gradle-support/4.0.1/gradle-support.gradle'
-apply from: 'https://raw.githubusercontent.com/ultraq/gradle-support/4.0.1/maven-publish-support.gradle'
+apply from: 'https://raw.githubusercontent.com/ultraq/gradle-support/4.3.1/gradle-support.gradle'
+apply from: 'https://raw.githubusercontent.com/ultraq/gradle-support/4.3.1/maven-publish-support.gradle'
 
 description = 'A collection of Groovy extensions to aid with profiling an application'
-version  = '0.7.0'
-sourceCompatibility = 1.8
+version  = '0.8.0'
 group = 'nz.net.ultraq.groovy'
 year = '2019'
 
-dependencies {
-	implementation 'nz.net.ultraq.groovy:groovy-extensions:2.0.0'
-	implementation 'org.apache.groovy:groovy:4.0.0'
-	implementation 'org.slf4j:slf4j-api:1.7.36'
+java {
+	sourceCompatibility = JavaVersion.VERSION_1_8
+}
 
-	testImplementation 'org.slf4j:slf4j-simple:1.7.36'
-	testImplementation 'org.spockframework:spock-core:2.2-M1-groovy-4.0'
+dependencies {
+	compileOnly 'org.apache.groovy:groovy:4.0.15'
+	implementation 'nz.net.ultraq.groovy:groovy-extensions:2.2.0'
+	implementation 'org.slf4j:slf4j-api:2.0.9'
+
+	testImplementation 'org.junit.jupiter:junit-jupiter:5.9.2'
+	testImplementation 'org.spockframework:spock-core:2.3-groovy-4.0'
+	testRuntimeOnly 'org.junit.platform:junit-platform-launcher'
 }
 
 test {
