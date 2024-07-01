@@ -29,7 +29,10 @@ group = 'nz.net.ultraq.groovy'
 year = '2019'
 
 java {
-	sourceCompatibility = JavaVersion.VERSION_1_8
+	toolchain {
+		languageVersion = JavaLanguageVersion.of(17)
+		vendor = JvmVendorSpec.ADOPTIUM
+	}
 }
 
 dependencies {
@@ -38,7 +41,7 @@ dependencies {
 	implementation 'org.slf4j:slf4j-api:2.0.13'
 
 	testImplementation 'org.junit.jupiter:junit-jupiter:5.10.3'
-	testImplementation 'org.spockframework:spock-core:2.3-groovy-4.0'
+	testImplementation 'org.spockframework:spock-core:2.4-M4-groovy-4.0'
 	testRuntimeOnly 'org.junit.platform:junit-platform-launcher'
 }
 

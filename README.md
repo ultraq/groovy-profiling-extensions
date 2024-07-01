@@ -12,7 +12,7 @@ A collection of Groovy extensions to aid with profiling an application.
 Installation
 ------------
 
-Minimum of Java 8 required.  Logging is done via [SLF4J](http://www.slf4j.org/),
+Minimum of Java 17 required.  Logging is done via [SLF4J](http://www.slf4j.org/),
 so some implementation of it is needed to pass to the methods to emit logs.
 
 Add a dependency to your project with the following co-ordinates:
