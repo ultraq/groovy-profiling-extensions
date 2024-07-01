@@ -21,12 +21,17 @@ import spock.lang.Specification
 
 /**
  * Tests for the profiling extension methods.
- * 
+ *
  * @author Emanuel Rabina
  */
 class ProfilingExtensionsTests extends Specification {
 
-	def logger = Mock(Logger)
+	Logger logger
+
+	def setup() {
+		logger = Mock(Logger)
+		logger.debugEnabled >> true
+	}
 
 	def "#average - Log the average of all executions after the given number of samples"() {
 		given:

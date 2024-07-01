@@ -23,7 +23,7 @@ import groovy.transform.CompileStatic
 /**
  * Extensions, often to the main {@code Object} class, for aiding with profiling
  * and performance testing.
- * 
+ *
  * @author Emanuel Rabina
  */
 @CompileStatic
@@ -37,7 +37,10 @@ class ProfilingExtensions {
 	 * Log the average time it takes to complete the given closure, using the
 	 * values of the last {@code samples} executions and emitting a log only after
 	 * every {@code samples} calls.
-	 * 
+	 * <p>
+	 * If debug-level logging is disabled for {@code logger}, then this method
+	 * just calls the closure.
+	 *
 	 * @param self
 	 * @param actionName
 	 * @param samples
@@ -49,19 +52,23 @@ class ProfilingExtensions {
 	 */
 	static <T> T average(Object self, String actionName, int samples, Logger logger, Closure<T> closure) {
 
-		def result = sample(actionName, samples, closure)
-		def executionTimes = executionTimesPerAction[actionName]
-		if (executionTimes.size() > samples) {
-			executionTimes.remove(0)
+		if (logger.debugEnabled) {
+			def result = sample(actionName, samples, closure)
+			def executionTimes = executionTimesPerAction[actionName]
+			if (executionTimes.size() > samples) {
+				executionTimes.remove(0)
+			}
+
+			def executions = (executionsPerAction[actionName] ?: 0) + 1
+			if (executions % samples == 0) {
+				logger.debug('{} average time: {}ms.', actionName, String.format('%.2f', executionTimes.average()))
+			}
+			executionsPerAction[actionName] = executions
+
+			return result
 		}
 
-		def executions = (executionsPerAction[actionName] ?: 0) + 1
-		if (executions % samples == 0) {
-			logger.debug('{} average time: {}ms.', actionName, String.format('%.2f', executionTimes.average()))
-		}
-		executionsPerAction[actionName] = executions
-
-		return result
+		return closure()
 	}
 
 	/**
@@ -69,7 +76,10 @@ class ProfilingExtensions {
 	 * values obtained within the last {@code seconds} seconds of execution and
 	 * emitting a log only after samples have been generated for the last
 	 * {@code seconds} seconds.
-	 * 
+	 * <p>
+	 * If debug-level logging is disabled for {@code logger}, then this method
+	 * just calls the closure.
+	 *
 	 * @param self
 	 * @param actionName
 	 * @param seconds
@@ -80,25 +90,29 @@ class ProfilingExtensions {
 	 */
 	static <T> T average(Object self, String actionName, float seconds, Logger logger, Closure<T> closure) {
 
-		def result = sample(actionName, 0, closure)
-		def executionTimes = executionTimesPerAction[actionName]
-		def lastExecutionTime = lastExecutionTimePerAction.getOrCreate(actionName) { ->
-			return System.currentTimeSeconds()
+		if (logger.debugEnabled) {
+			def result = sample(actionName, 0, closure)
+			def executionTimes = executionTimesPerAction[actionName]
+			def lastExecutionTime = lastExecutionTimePerAction.getOrCreate(actionName) { ->
+				return System.currentTimeSeconds()
+			}
+
+			def currentExecutionTime = System.currentTimeSeconds()
+			if (currentExecutionTime - lastExecutionTime >= seconds) {
+				logger.debug('{} average time: {}ms.', actionName, String.format('%.2f', executionTimes.average()))
+				lastExecutionTimePerAction[actionName] = currentExecutionTime
+				executionTimes.clear()
+			}
+
+			return result
 		}
 
-		def currentExecutionTime = System.currentTimeSeconds()
-		if (currentExecutionTime - lastExecutionTime >= seconds) {
-			logger.debug('{} average time: {}ms.', actionName, String.format('%.2f', executionTimes.average()))
-			lastExecutionTimePerAction[actionName] = currentExecutionTime
-			executionTimes.clear()
-		}
-
-		return result
+		return closure()
 	}
 
 	/**
-	 * The same as {@link #average} but with nanosecond precision.
-	 * 
+	 * The same as {@link #average(Object, String, int, Logger, Closure)} but with nanosecond precision.
+	 *
 	 * @param self
 	 * @param actionName
 	 * @param samples
@@ -110,27 +124,28 @@ class ProfilingExtensions {
 	 */
 	static <T> T averageNanos(Object self, String actionName, int samples, Logger logger, Closure<T> closure) {
 
-		def result = sampleNanos(actionName, samples, closure)
-		def executionTimes = executionTimesPerAction[actionName]
-		if (executionTimes.size() > samples) {
-			executionTimes.remove(0)
+		if (logger.debugEnabled) {
+			def result = sampleNanos(actionName, samples, closure)
+			def executionTimes = executionTimesPerAction[actionName]
+			if (executionTimes.size() > samples) {
+				executionTimes.remove(0)
+			}
+
+			def executions = (executionsPerAction[actionName] ?: 0) + 1
+			if (executions % samples == 0) {
+				logger.debug('{} average time: {}ns.', actionName, String.format('%.2f', executionTimes.average()))
+			}
+			executionsPerAction[actionName] = executions
+
+			return result
 		}
 
-		def executions = (executionsPerAction[actionName] ?: 0) + 1
-		if (executions % samples == 0) {
-			logger.debug('{} average time: {}ns.', actionName, String.format('%.2f', executionTimes.average()))
-		}
-		executionsPerAction[actionName] = executions
-
-		return result
+		return closure()
 	}
 
 	/**
-	 * Log the average time it takes to complete the given closure, using the
-	 * values obtained within the last {@code seconds} seconds of execution and
-	 * emitting a log only after samples have been generated for the last
-	 * {@code seconds} seconds.
-	 * 
+	 * The same as {@link #average(Object, String, float, Logger, Closure)} but with nanosecond precision.
+	 *
 	 * @param self
 	 * @param actionName
 	 * @param seconds
@@ -141,26 +156,30 @@ class ProfilingExtensions {
 	 */
 	static <T> T averageNanos(Object self, String actionName, float seconds, Logger logger, Closure<T> closure) {
 
-		def result = sampleNanos(actionName, 0, closure)
-		def executionTimes = executionTimesPerAction[actionName]
-		def lastExecutionTime = lastExecutionTimePerAction.getOrCreate(actionName) { ->
-			return System.currentTimeSeconds()
+		if (logger.debugEnabled) {
+			def result = sampleNanos(actionName, 0, closure)
+			def executionTimes = executionTimesPerAction[actionName]
+			def lastExecutionTime = lastExecutionTimePerAction.getOrCreate(actionName) { ->
+				return System.currentTimeSeconds()
+			}
+
+			def currentExecutionTime = System.currentTimeSeconds()
+			if (currentExecutionTime - lastExecutionTime >= seconds) {
+				logger.debug('{} average time: {}ns.', actionName, String.format('%.2f', executionTimes.average()))
+				lastExecutionTimePerAction[actionName] = currentExecutionTime
+				executionTimes.clear()
+			}
+
+			return result
 		}
 
-		def currentExecutionTime = System.currentTimeSeconds()
-		if (currentExecutionTime - lastExecutionTime >= seconds) {
-			logger.debug('{} average time: {}ns.', actionName, String.format('%.2f', executionTimes.average()))
-			lastExecutionTimePerAction[actionName] = currentExecutionTime
-			executionTimes.clear()
-		}
-
-		return result
+		return closure()
 	}
 
 	/**
 	 * Sample, with millisecond precision, the amount of time it takes to complete
 	 * the given closure.
-	 * 
+	 *
 	 * @param actionName
 	 * @param samples
 	 * @param closure
@@ -185,7 +204,7 @@ class ProfilingExtensions {
 	/**
 	 * Sample, with nanosecond precision, the amount of time it takes to complete
 	 * the given closure.
-	 * 
+	 *
 	 * @param actionName
 	 * @param samples
 	 * @param closure
@@ -209,7 +228,7 @@ class ProfilingExtensions {
 
 	/**
 	 * Capture and return the time it takes to perform the given closure.
-	 * 
+	 *
 	 * @param self
 	 * @param closure
 	 * @return
@@ -224,8 +243,8 @@ class ProfilingExtensions {
 	}
 
 	/**
-	 * Capture and return the time it takes to perform the given closure.
-	 * 
+	 * The same as {@link #time(Object, Closure)} but with nanosecond precision.
+	 *
 	 * @param self
 	 * @param closure
 	 * @return
@@ -241,7 +260,10 @@ class ProfilingExtensions {
 
 	/**
 	 * Capture and log the time it takes to perform the given closure.
-	 * 
+	 * <p>
+	 * If debug-level logging is disabled for {@code logger}, then this method
+	 * just calls the closure.
+	 *
 	 * @param self
 	 * @param actionName
 	 * @param closure
@@ -251,19 +273,24 @@ class ProfilingExtensions {
 	 */
 	static <T> T time(Object self, String actionName, Logger logger, Closure<T> closure) {
 
-		def start = System.currentTimeMillis()
-		def result = closure()
-		def finish = System.currentTimeMillis()
-		def executionTime = finish - start
+		if (logger.debugEnabled) {
+			def start = System.currentTimeMillis()
+			def result = closure()
+			def finish = System.currentTimeMillis()
+			def executionTime = finish - start
 
-		logger.debug('{} complete.  Execution time: {}ms.', actionName, executionTime)
+			logger.debug('{} complete.  Execution time: {}ms.', actionName, executionTime)
 
-		return result
+			return result
+		}
+
+		return closure()
 	}
 
 	/**
-	 * The same as {@link #time(Object, String, Logger, Closure)} but with nanosecond precision.
-	 * 
+	 * The same as {@link #time(Object, String, Logger, Closure)} but with
+	 * nanosecond precision.
+	 *
 	 * @param self
 	 * @param actionName
 	 * @param logger
@@ -273,20 +300,24 @@ class ProfilingExtensions {
 	 */
 	static <T> T timeNanos(Object self, String actionName, Logger logger, Closure<T> closure) {
 
-		def start = System.nanoTime()
-		def result = closure()
-		def finish = System.nanoTime()
-		def executionTime = finish - start
+		if (logger.debugEnabled) {
+			def start = System.nanoTime()
+			def result = closure()
+			def finish = System.nanoTime()
+			def executionTime = finish - start
 
-		logger.debug('{} complete.  Execution time: {}ns.', actionName, executionTime)
+			logger.debug('{} complete.  Execution time: {}ns.', actionName, executionTime)
 
-		return result
+			return result
+		}
+
+		return closure()
 	}
 
 	/**
 	 * Capture and log the time it takes to perform the given closure, and the
 	 * average of the last {@code samples} executions of the specific action.
-	 * 
+	 *
 	 * @param self
 	 * @param actionName
 	 * @param samples
@@ -298,21 +329,25 @@ class ProfilingExtensions {
 	 */
 	static <T> T timeWithAverage(Object self, String actionName, int samples, Logger logger, Closure<T> closure) {
 
-		def result = sample(actionName, samples, closure)
-		def executionTimes = executionTimesPerAction[actionName]
-		if (executionTimes.size() > samples) {
-			executionTimes.remove(0)
+		if (logger.debugEnabled) {
+			def result = sample(actionName, samples, closure)
+			def executionTimes = executionTimesPerAction[actionName]
+			if (executionTimes.size() > samples) {
+				executionTimes.remove(0)
+			}
+
+			logger.debug('{} complete.  Execution time: {}ms.  Average time: {}ms.',
+				actionName, executionTimes.last(), String.format('%.2f', executionTimes.average()))
+
+			return result
 		}
 
-		logger.debug('{} complete.  Execution time: {}ms.  Average time: {}ms.',
-			actionName, executionTimes.last(), String.format('%.2f', executionTimes.average()))
-
-		return result
+		return closure()
 	}
 
 	/**
 	 * The same as {@link #timeWithAverage} but with nanosecond precision.
-	 * 
+	 *
 	 * @param self
 	 * @param actionName
 	 * @param samples
@@ -324,15 +359,19 @@ class ProfilingExtensions {
 	 */
 	static <T> T timeWithAverageNanos(Object self, String actionName, int samples, Logger logger, Closure<T> closure) {
 
-		def result = sampleNanos(actionName, samples, closure)
-		def executionTimes = executionTimesPerAction[actionName]
-		if (executionTimes.size() > samples) {
-			executionTimes.remove(0)
+		if (logger.debugEnabled) {
+			def result = sampleNanos(actionName, samples, closure)
+			def executionTimes = executionTimesPerAction[actionName]
+			if (executionTimes.size() > samples) {
+				executionTimes.remove(0)
+			}
+
+			logger.debug('{} complete.  Execution time: {}ns.  Average time: {}ns.',
+				actionName, executionTimes.last(), String.format('%.2f', executionTimes.average()))
+
+			return result
 		}
 
-		logger.debug('{} complete.  Execution time: {}ns.  Average time: {}ns.',
-			actionName, executionTimes.last(), String.format('%.2f', executionTimes.average()))
-
-		return result
+		return closure()
 	}
 }
