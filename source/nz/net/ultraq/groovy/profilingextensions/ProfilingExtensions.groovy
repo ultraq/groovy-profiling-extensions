@@ -61,7 +61,7 @@ class ProfilingExtensions {
 
 			var executions = (executionsPerAction[actionName] ?: 0) + 1
 			if (executions % samples == 0) {
-				logger.debug('{} average time: {}ms.', actionName, String.format('%.2f', executionTimes.average()))
+				logger.debug('{} average time: {}ms', actionName, String.format('%.2f', executionTimes.average()))
 			}
 			executionsPerAction[actionName] = executions
 
@@ -99,7 +99,7 @@ class ProfilingExtensions {
 
 			var currentExecutionTime = System.currentTimeMillis()
 			if ((currentExecutionTime - lastExecutionTime) / 1000 >= seconds) {
-				logger.debug('{} average time: {}ms.', actionName, String.format('%.2f', executionTimes.average()))
+				logger.debug('{} average time: {}ms', actionName, String.format('%.2f', executionTimes.average()))
 				lastExecutionTimePerAction[actionName] = currentExecutionTime
 				executionTimes.clear()
 			}
@@ -133,7 +133,7 @@ class ProfilingExtensions {
 
 			var executions = (executionsPerAction[actionName] ?: 0) + 1
 			if (executions % samples == 0) {
-				logger.debug('{} average time: {}ns.', actionName, String.format('%.2f', executionTimes.average()))
+				logger.debug('{} average time: {}ns', actionName, String.format('%.2f', executionTimes.average()))
 			}
 			executionsPerAction[actionName] = executions
 
@@ -165,7 +165,7 @@ class ProfilingExtensions {
 
 			var currentExecutionTime = System.currentTimeMillis()
 			if ((currentExecutionTime - lastExecutionTime) / 1000 >= seconds) {
-				logger.debug('{} average time: {}ns.', actionName, String.format('%.2f', executionTimes.average()))
+				logger.debug('{} average time: {}ns', actionName, String.format('%.2f', executionTimes.average()))
 				lastExecutionTimePerAction[actionName] = currentExecutionTime
 				executionTimes.clear()
 			}
@@ -279,7 +279,7 @@ class ProfilingExtensions {
 			var finish = System.currentTimeMillis()
 			var executionTime = finish - start
 
-			logger.debug('{} complete.  Execution time: {}ms.', actionName, executionTime)
+			logger.debug('{} execution time: {}ms', actionName, executionTime)
 
 			return result
 		}
@@ -306,7 +306,7 @@ class ProfilingExtensions {
 			var finish = System.nanoTime()
 			var executionTime = finish - start
 
-			logger.debug('{} complete.  Execution time: {}ns.', actionName, executionTime)
+			logger.debug('{} execution time: {}ns', actionName, executionTime)
 
 			return result
 		}
@@ -336,7 +336,7 @@ class ProfilingExtensions {
 				executionTimes.remove(0)
 			}
 
-			logger.debug('{} complete.  Execution time: {}ms.  Average time: {}ms.',
+			logger.debug('{} execution time: {}ms, average time: {}ms',
 				actionName, executionTimes.last(), String.format('%.2f', executionTimes.average()))
 
 			return result
@@ -366,7 +366,7 @@ class ProfilingExtensions {
 				executionTimes.remove(0)
 			}
 
-			logger.debug('{} complete.  Execution time: {}ns.  Average time: {}ns.',
+			logger.debug('{} execution time: {}ns, average time: {}ns',
 				actionName, executionTimes.last(), String.format('%.2f', executionTimes.average()))
 
 			return result

@@ -16,8 +16,12 @@
 
 package nz.net.ultraq.groovy.profilingextensions
 
-import org.slf4j.Logger
+import com.github.valfirst.slf4jtest.TestLogger
+import com.github.valfirst.slf4jtest.TestLoggerFactory
 import spock.lang.Specification
+import static com.github.valfirst.slf4jtest.Assertions.assertThat
+
+import java.util.concurrent.atomic.AtomicInteger
 
 /**
  * Tests for the profiling extension methods.
@@ -26,108 +30,116 @@ import spock.lang.Specification
  */
 class ProfilingExtensionsTests extends Specification {
 
-	Logger logger
+	private static AtomicInteger loggerNumber = new AtomicInteger()
+	private TestLogger logger
 
 	def setup() {
-		logger = Mock(Logger)
-		logger.debugEnabled >> true
+		logger = TestLoggerFactory.getTestLogger("ProfilingExtensionTestsLogger-${loggerNumber.getAndIncrement()}")
 	}
 
 	def "#average - Log the average of all executions after the given number of samples"() {
 		given:
-			def actionName = 'Test average'
-			def samples = 2
-			def profiledAction = {
+			var actionName = 'Test average'
+			var samples = 2
+		when:
+			samples.times {
 				average(actionName, samples, logger) {
 					// Nothing happening here
 				}
 			}
-		when:
-			samples.times {
-				profiledAction()
-			}
 		then:
-			1 * logger.debug('{} average time: {}ms.', actionName, { it ==~ /\d+\.\d{2}/ })
+			assertThat(logger).hasLogged { event ->
+				return event.message == '{} average time: {}ms' &&
+					event.arguments[0] == actionName &&
+					event.arguments[1] ==~ /\d+\.\d{2}/
+			}
 	}
 
 	def "#averageNanos - Log the average of all executions after the given number of samples"() {
 		given:
-			def actionName = 'Test averageNanos'
-			def samples = 2
-			def profiledAction = {
+			var actionName = 'Test averageNanos'
+			var samples = 2
+		when:
+			samples.times {
 				averageNanos(actionName, samples, logger) {
 					// Nothing happening here
 				}
 			}
-		when:
-			samples.times {
-				profiledAction()
-			}
 		then:
-			1 * logger.debug('{} average time: {}ns.', actionName, { it ==~ /\d+\.\d{2}/ })
+			assertThat(logger).hasLogged { event ->
+				return event.message == '{} average time: {}ns' &&
+					event.arguments[0] == actionName &&
+					event.arguments[1] ==~ /\d+\.\d{2}/
+			}
 	}
 
 	def "#time - Logs the time the closure took to execute, returning its result"() {
 		given:
-			def actionName = 'Test time'
-			def profiledAction = {
-				time(actionName, logger) {
-					return 'Hi!'
-				}
-			}
+			var actionName = 'Test time'
 		when:
-			def result = profiledAction()
+			var result = time(actionName, logger) {
+				return 'Hi!'
+			}
 		then:
-			1 * logger.debug('{} complete.  Execution time: {}ms.', actionName, _ as Long)
+			assertThat(logger).hasLogged { event ->
+				return event.message == '{} execution time: {}ms' &&
+					event.arguments[0] == actionName &&
+					event.arguments[1] instanceof Long
+			}
 			result == 'Hi!'
 	}
 
 	def "#timeNanos - Logs the time the closure took to execute, returning its result"() {
 		given:
-			def actionName = 'Test timeNanos'
-			def profiledAction = {
-				timeNanos(actionName, logger) {
-					return 'Hi!'
-				}
-			}
+			var actionName = 'Test timeNanos'
 		when:
-			def result = profiledAction()
+			var result = timeNanos(actionName, logger) {
+				return 'Hi!'
+			}
 		then:
-			1 * logger.debug('{} complete.  Execution time: {}ns.', actionName, _ as Long)
+			assertThat(logger).hasLogged { event ->
+				return event.message == '{} execution time: {}ns' &&
+					event.arguments[0] == actionName &&
+					event.arguments[1] instanceof Long
+			}
 			result == 'Hi!'
 	}
 
 	def "#timeWithAverage - Logs the current and average time the closure took to execute"() {
 		given:
-			def actionName = 'Test timeWithAverage'
-			def samples = 2
-			def profiledAction = {
+			var actionName = 'Test timeWithAverage'
+			var samples = 2
+		when:
+			samples.times {
 				timeWithAverage(actionName, samples, logger) {
 					// Nothing happening here
 				}
 			}
-		when:
-			samples.times {
-				profiledAction()
-			}
 		then:
-			2 * logger.debug('{} complete.  Execution time: {}ms.  Average time: {}ms.', actionName, _ as Long, { it ==~ /\d+\.\d{2}/ })
+			assertThat(logger).hasLogged { event ->
+				return event.message == '{} execution time: {}ms, average time: {}ms' &&
+					event.arguments[0] == actionName &&
+					event.arguments[1] instanceof Long &&
+					event.arguments[2] ==~ /\d+\.\d{2}/
+			}
 	}
 
 	def "#timeWithAverageNanos - Logs the current and average time the closure took to execute"() {
 		given:
-			def actionName = 'Test timeWithAverageNanos'
-			def samples = 2
-			def profiledAction = {
+			var actionName = 'Test timeWithAverageNanos'
+			var samples = 2
+		when:
+			samples.times {
 				timeWithAverageNanos(actionName, samples, logger) {
 					// Nothing happening here
 				}
 			}
-		when:
-			samples.times {
-				profiledAction()
-			}
 		then:
-			2 * logger.debug('{} complete.  Execution time: {}ns.  Average time: {}ns.', actionName, _ as Long, { it ==~ /\d+\.\d{2}/ })
+			assertThat(logger).hasLogged { event ->
+				return event.message == '{} execution time: {}ns, average time: {}ns' &&
+					event.arguments[0] == actionName &&
+					event.arguments[1] instanceof Long &&
+					event.arguments[2] ==~ /\d+\.\d{2}/
+			}
 	}
 }
