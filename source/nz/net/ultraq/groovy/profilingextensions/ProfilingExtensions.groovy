@@ -111,7 +111,8 @@ class ProfilingExtensions {
 	}
 
 	/**
-	 * The same as {@link #average(Object, String, int, Logger, Closure)} but with nanosecond precision.
+	 * The same as {@link #average(Object, String, int, Logger, Closure)} but with
+	 * nanosecond precision.
 	 *
 	 * @param self
 	 * @param actionName
@@ -144,7 +145,8 @@ class ProfilingExtensions {
 	}
 
 	/**
-	 * The same as {@link #average(Object, String, float, Logger, Closure)} but with nanosecond precision.
+	 * The same as {@link #average(Object, String, float, Logger, Closure)} but
+	 * with nanosecond precision.
 	 *
 	 * @param self
 	 * @param actionName
