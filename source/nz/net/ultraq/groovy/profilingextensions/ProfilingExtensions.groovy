@@ -94,11 +94,11 @@ class ProfilingExtensions {
 			var result = sample(actionName, 0, closure)
 			var executionTimes = executionTimesPerAction[actionName]
 			var lastExecutionTime = lastExecutionTimePerAction.getOrCreate(actionName) { ->
-				return System.currentTimeSeconds()
+				return System.currentTimeMillis()
 			}
 
-			var currentExecutionTime = System.currentTimeSeconds()
-			if (currentExecutionTime - lastExecutionTime >= seconds) {
+			var currentExecutionTime = System.currentTimeMillis()
+			if ((currentExecutionTime - lastExecutionTime) / 1000 >= seconds) {
 				logger.debug('{} average time: {}ms.', actionName, String.format('%.2f', executionTimes.average()))
 				lastExecutionTimePerAction[actionName] = currentExecutionTime
 				executionTimes.clear()
@@ -160,11 +160,11 @@ class ProfilingExtensions {
 			var result = sampleNanos(actionName, 0, closure)
 			var executionTimes = executionTimesPerAction[actionName]
 			var lastExecutionTime = lastExecutionTimePerAction.getOrCreate(actionName) { ->
-				return System.currentTimeSeconds()
+				return System.currentTimeMillis()
 			}
 
-			var currentExecutionTime = System.currentTimeSeconds()
-			if (currentExecutionTime - lastExecutionTime >= seconds) {
+			var currentExecutionTime = System.currentTimeMillis()
+			if ((currentExecutionTime - lastExecutionTime) / 1000 >= seconds) {
 				logger.debug('{} average time: {}ns.', actionName, String.format('%.2f', executionTimes.average()))
 				lastExecutionTimePerAction[actionName] = currentExecutionTime
 				executionTimes.clear()
