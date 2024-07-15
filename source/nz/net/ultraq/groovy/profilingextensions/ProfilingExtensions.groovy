@@ -17,6 +17,8 @@
 package nz.net.ultraq.groovy.profilingextensions
 
 import org.slf4j.Logger
+import org.slf4j.Marker
+import org.slf4j.MarkerFactory
 
 import groovy.transform.CompileStatic
 
@@ -28,6 +30,8 @@ import groovy.transform.CompileStatic
  */
 @CompileStatic
 class ProfilingExtensions {
+
+	static final Marker profilingMarker = MarkerFactory.getMarker("Profiling")
 
 	private static final Map<String,Integer> executionsPerAction = [:]
 	private static final Map<String,List<Long>> executionTimesPerAction = [:]
@@ -61,7 +65,7 @@ class ProfilingExtensions {
 
 			var executions = (executionsPerAction[actionName] ?: 0) + 1
 			if (executions % samples == 0) {
-				logger.debug('{} average time: {}ms', actionName, String.format('%.2f', executionTimes.average()))
+				logger.debug(profilingMarker, '{} average time: {}ms', actionName, String.format('%.2f', executionTimes.average()))
 			}
 			executionsPerAction[actionName] = executions
 
@@ -99,7 +103,7 @@ class ProfilingExtensions {
 
 			var currentExecutionTime = System.currentTimeMillis()
 			if ((currentExecutionTime - lastExecutionTime) / 1000 >= seconds) {
-				logger.debug('{} average time: {}ms', actionName, String.format('%.2f', executionTimes.average()))
+				logger.debug(profilingMarker, '{} average time: {}ms', actionName, String.format('%.2f', executionTimes.average()))
 				lastExecutionTimePerAction[actionName] = currentExecutionTime
 				executionTimes.clear()
 			}
@@ -134,7 +138,7 @@ class ProfilingExtensions {
 
 			var executions = (executionsPerAction[actionName] ?: 0) + 1
 			if (executions % samples == 0) {
-				logger.debug('{} average time: {}ns', actionName, String.format('%.2f', executionTimes.average()))
+				logger.debug(profilingMarker, '{} average time: {}ns', actionName, String.format('%.2f', executionTimes.average()))
 			}
 			executionsPerAction[actionName] = executions
 
@@ -167,7 +171,7 @@ class ProfilingExtensions {
 
 			var currentExecutionTime = System.currentTimeMillis()
 			if ((currentExecutionTime - lastExecutionTime) / 1000 >= seconds) {
-				logger.debug('{} average time: {}ns', actionName, String.format('%.2f', executionTimes.average()))
+				logger.debug(profilingMarker, '{} average time: {}ns', actionName, String.format('%.2f', executionTimes.average()))
 				lastExecutionTimePerAction[actionName] = currentExecutionTime
 				executionTimes.clear()
 			}
@@ -281,7 +285,7 @@ class ProfilingExtensions {
 			var finish = System.currentTimeMillis()
 			var executionTime = finish - start
 
-			logger.debug('{} execution time: {}ms', actionName, executionTime)
+			logger.debug(profilingMarker, '{} execution time: {}ms', actionName, executionTime)
 
 			return result
 		}
@@ -308,7 +312,7 @@ class ProfilingExtensions {
 			var finish = System.nanoTime()
 			var executionTime = finish - start
 
-			logger.debug('{} execution time: {}ns', actionName, executionTime)
+			logger.debug(profilingMarker, '{} execution time: {}ns', actionName, executionTime)
 
 			return result
 		}
@@ -338,7 +342,7 @@ class ProfilingExtensions {
 				executionTimes.remove(0)
 			}
 
-			logger.debug('{} execution time: {}ms, average time: {}ms',
+			logger.debug(profilingMarker, '{} execution time: {}ms, average time: {}ms',
 				actionName, executionTimes.last(), String.format('%.2f', executionTimes.average()))
 
 			return result
@@ -368,7 +372,7 @@ class ProfilingExtensions {
 				executionTimes.remove(0)
 			}
 
-			logger.debug('{} execution time: {}ns, average time: {}ns',
+			logger.debug(profilingMarker, '{} execution time: {}ns, average time: {}ns',
 				actionName, executionTimes.last(), String.format('%.2f', executionTimes.average()))
 
 			return result

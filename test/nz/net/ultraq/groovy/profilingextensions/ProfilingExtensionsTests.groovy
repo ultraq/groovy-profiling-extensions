@@ -49,7 +49,8 @@ class ProfilingExtensionsTests extends Specification {
 			}
 		then:
 			assertThat(logger).hasLogged { event ->
-				return event.message == '{} average time: {}ms' &&
+				return event.markers.contains(ProfilingExtensions.profilingMarker) &&
+					event.message == '{} average time: {}ms' &&
 					event.arguments[0] == actionName &&
 					event.arguments[1] ==~ /\d+\.\d{2}/
 			}
@@ -74,7 +75,8 @@ class ProfilingExtensionsTests extends Specification {
 			}
 		then:
 			assertThat(logger).hasLogged { event ->
-				return event.message == '{} average time: {}ms' &&
+				return event.markers.contains(ProfilingExtensions.profilingMarker) &&
+					event.message == '{} average time: {}ms' &&
 					event.arguments[0] == actionName &&
 					event.arguments[1] ==~ /\d+\.\d{2}/
 			}
@@ -92,7 +94,8 @@ class ProfilingExtensionsTests extends Specification {
 			}
 		then:
 			assertThat(logger).hasLogged { event ->
-				return event.message == '{} average time: {}ns' &&
+				return event.markers.contains(ProfilingExtensions.profilingMarker) &&
+					event.message == '{} average time: {}ns' &&
 					event.arguments[0] == actionName &&
 					event.arguments[1] ==~ /\d+\.\d{2}/
 			}
@@ -117,7 +120,8 @@ class ProfilingExtensionsTests extends Specification {
 			}
 		then:
 			assertThat(logger).hasLogged { event ->
-				return event.message == '{} average time: {}ns' &&
+				return event.markers.contains(ProfilingExtensions.profilingMarker) &&
+					event.message == '{} average time: {}ns' &&
 					event.arguments[0] == actionName &&
 					event.arguments[1] ==~ /\d+\.\d{2}/
 			}
@@ -144,7 +148,8 @@ class ProfilingExtensionsTests extends Specification {
 			}
 		then:
 			assertThat(logger).hasLogged { event ->
-				return event.message == '{} execution time: {}ms' &&
+				return event.markers.contains(ProfilingExtensions.profilingMarker) &&
+					event.message == '{} execution time: {}ms' &&
 					event.arguments[0] == actionName &&
 					event.arguments[1] instanceof Long
 			}
@@ -172,7 +177,8 @@ class ProfilingExtensionsTests extends Specification {
 			}
 		then:
 			assertThat(logger).hasLogged { event ->
-				return event.message == '{} execution time: {}ns' &&
+				return event.markers.contains(ProfilingExtensions.profilingMarker) &&
+					event.message == '{} execution time: {}ns' &&
 					event.arguments[0] == actionName &&
 					event.arguments[1] instanceof Long
 			}
@@ -191,7 +197,8 @@ class ProfilingExtensionsTests extends Specification {
 			}
 		then:
 			assertThat(logger).hasLogged { event ->
-				return event.message == '{} execution time: {}ms, average time: {}ms' &&
+				return event.markers.contains(ProfilingExtensions.profilingMarker) &&
+					event.message == '{} execution time: {}ms, average time: {}ms' &&
 					event.arguments[0] == actionName &&
 					event.arguments[1] instanceof Long &&
 					event.arguments[2] ==~ /\d+\.\d{2}/
@@ -210,7 +217,8 @@ class ProfilingExtensionsTests extends Specification {
 			}
 		then:
 			assertThat(logger).hasLogged { event ->
-				return event.message == '{} execution time: {}ns, average time: {}ns' &&
+				return event.markers.contains(ProfilingExtensions.profilingMarker) &&
+					event.message == '{} execution time: {}ns, average time: {}ns' &&
 					event.arguments[0] == actionName &&
 					event.arguments[1] instanceof Long &&
 					event.arguments[2] ==~ /\d+\.\d{2}/
