@@ -15,47 +15,62 @@
  */
 
 plugins {
-	id 'groovy'
-	id 'jacoco'
-	id 'maven-publish'
 	id 'idea'
+	id 'nz.net.ultraq.gradle.fluent-configuration' version '0.8.0'
 }
-apply from: 'https://raw.githubusercontent.com/ultraq/gradle-support/4.3.1/gradle-support.gradle'
-apply from: 'https://raw.githubusercontent.com/ultraq/gradle-support/4.3.1/maven-publish-support.gradle'
 
 description = 'A collection of Groovy extensions to aid with profiling an application'
-version  = '0.10.0'
+version  = '0.10.1-SNAPSHOT'
 group = 'nz.net.ultraq.groovy'
-year = '2019'
 
-java {
-	toolchain {
-		languageVersion = JavaLanguageVersion.of(17)
-	}
-}
+configure {
+	createGroovyLibraryProject()
+		.useJavaVersion(17)
+		.useMavenCentralRepositories()
+		.withGroovydocOptions() {
+			link('https://www.slf4j.org/apidocs/', 'org.slf4j.')
+		}
+		.withJarOptions() {
+			manifest {
+				attributes('Automatic-Module-Name': 'nz.net.ultraq.groovy.profilingextensions')
+			}
+		}
+		.withSourcesJar()
+		.withGroovydocJar()
+		.configureSource()
+			.withSourceDirectory('source')
+			.withDependencies() {
+				compileOnly 'org.apache.groovy:groovy:4.0.29'
+				implementation 'nz.net.ultraq.groovy:groovy-extensions:3.3.0'
+				implementation 'org.slf4j:slf4j-api:2.0.17'
+			}
+			.expandExtensionModuleVersion()
+		.configureVerification()
+			.withTestDirectory('test')
+			.withTestDependencies() {
+				testImplementation 'com.github.valfirst:slf4j-test:3.0.3'
+				testImplementation 'org.assertj:assertj-core:3.27.6'
+				testImplementation 'org.spockframework:spock-core:2.4-groovy-4.0'
+			}
+			.useJUnitJupiter()
+			.useJacoco()
 
-dependencies {
-	compileOnly 'org.apache.groovy:groovy:4.0.21'
-	implementation 'nz.net.ultraq.groovy:groovy-extensions:2.3.1'
-	implementation 'org.slf4j:slf4j-api:2.0.13'
-
-	testImplementation 'com.github.valfirst:slf4j-test:3.0.1'
-	testImplementation 'org.assertj:assertj-core:3.24.2'
-	testImplementation 'org.junit.jupiter:junit-jupiter:5.10.3'
-	testImplementation 'org.spockframework:spock-core:2.4-M4-groovy-4.0'
-	testRuntimeOnly 'org.junit.platform:junit-platform-launcher'
-}
-
-test {
-	useJUnitPlatform()
-}
-
-groovydoc {
-	link('https://www.slf4j.org/apidocs/', 'org.slf4j.')
-}
-
-jar {
-	manifest {
-		attributes('Automatic-Module-Name': 'nz.net.ultraq.groovy.profilingextensions')
-	}
+		createMavenPublication()
+  		.withArtifacts(groovydocJar)
+  		.configurePom() {
+  			url = 'https://github.com/ultraq/groovy-profiling-extensions'
+  			inceptionYear = '2019'
+  		}
+  			.useApache20License()
+  			.withGitHubScm('ultraq')
+  			.withDevelopers([
+  				name: 'Emanuel Rabina',
+  				email: 'emanuelrabina@gmail.com',
+  				url: 'https://www.ultraq.net.nz'
+  			])
+  		.publishToMavenCentral(
+  			findProperty('mavenCentral.publisher.username'),
+  			findProperty('mavenCentral.publisher.password'),
+  			'nz.net.ultraq'
+  		)
 }
