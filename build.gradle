@@ -20,7 +20,7 @@ plugins {
 }
 
 description = 'A collection of Groovy extensions to aid with profiling an application'
-version  = '0.10.1-SNAPSHOT'
+version  = '0.10.1'
 group = 'nz.net.ultraq.groovy'
 
 configure {
