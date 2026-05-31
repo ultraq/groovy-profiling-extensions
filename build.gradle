@@ -16,11 +16,11 @@
 
 plugins {
 	id 'idea'
-	id 'nz.net.ultraq.gradle.fluent-configuration' version '0.8.0'
+	id 'nz.net.ultraq.gradle.fluent-configuration' version '0.9.4'
 }
 
 description = 'A collection of Groovy extensions to aid with profiling an application'
-version  = '0.10.1'
+version  = '0.11.0'
 group = 'nz.net.ultraq.groovy'
 
 configure {
@@ -40,17 +40,17 @@ configure {
 		.configureSource()
 			.withSourceDirectory('source')
 			.withDependencies() {
-				compileOnly 'org.apache.groovy:groovy:4.0.29'
-				implementation 'nz.net.ultraq.groovy:groovy-extensions:3.3.0'
-				implementation 'org.slf4j:slf4j-api:2.0.17'
+				compileOnly 'org.apache.groovy:groovy:5.0.6'
+				implementation 'nz.net.ultraq.groovy:groovy-extensions:4.0.0'
+				implementation 'org.slf4j:slf4j-api:2.0.18'
 			}
 			.expandExtensionModuleVersion()
 		.configureVerification()
 			.withTestDirectory('test')
 			.withTestDependencies() {
 				testImplementation 'com.github.valfirst:slf4j-test:3.0.3'
-				testImplementation 'org.assertj:assertj-core:3.27.6'
-				testImplementation 'org.spockframework:spock-core:2.4-groovy-4.0'
+				testImplementation 'org.assertj:assertj-core:3.27.7'
+				testImplementation 'org.spockframework:spock-core:2.4-groovy-5.0'
 			}
 			.useJUnitJupiter()
 			.useJacoco()
@@ -68,9 +68,11 @@ configure {
   				email: 'emanuelrabina@gmail.com',
   				url: 'https://www.ultraq.net.nz'
   			])
-  		.publishToMavenCentral(
+
+		createMavenCentralPublisherBundle()
+			.forThisProject()
+			.withCredentials(
   			findProperty('mavenCentral.publisher.username'),
-  			findProperty('mavenCentral.publisher.password'),
-  			'nz.net.ultraq'
+  			findProperty('mavenCentral.publisher.password')
   		)
 }
