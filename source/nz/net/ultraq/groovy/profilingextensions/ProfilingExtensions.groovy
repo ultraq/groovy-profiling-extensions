@@ -136,6 +136,17 @@ class ProfilingExtensions {
 	}
 
 	/**
+	 * Capture and return the time it takes, in milliseconds, to perform the given
+	 * closure.
+	 */
+	static long time(Object self, Closure closure) {
+
+		var start = System.currentTimeMillis()
+		closure()
+		return System.currentTimeMillis() - start
+	}
+
+	/**
 	 * Capture and log the time it takes to perform the given closure.
 	 * <p>
 	 * If debug-level logging is disabled for {@code logger}, then this method

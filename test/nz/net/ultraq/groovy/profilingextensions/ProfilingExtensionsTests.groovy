@@ -111,6 +111,15 @@ class ProfilingExtensionsTests extends Specification {
 			result == 'Hi!'
 	}
 
+	def "time - Return the time it takes to execute an acion"() {
+		when:
+			var result = time() { ->
+				Thread.sleep(100)
+			}
+		then:
+			result > 0
+	}
+
 	def "time - Log the time taken to execute an action"() {
 		given:
 			var logger = Mock(Logger) {

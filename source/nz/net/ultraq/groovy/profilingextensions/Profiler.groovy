@@ -33,7 +33,7 @@ import groovy.transform.TupleConstructor
 @TupleConstructor
 class Profiler {
 
-	static final Marker marker = MarkerFactory.getMarker("Profiling")
+	public static final Marker marker = MarkerFactory.getMarker("Profiler")
 
 	final Logger logger
 	final String format
