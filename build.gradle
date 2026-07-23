@@ -20,7 +20,7 @@ plugins {
 }
 
 description = 'A collection of Groovy extensions to aid with profiling an application'
-version  = '0.11.0'
+version  = '0.12.0-SNAPSHOT'
 group = 'nz.net.ultraq.groovy'
 
 configure {
@@ -40,16 +40,13 @@ configure {
 		.configureSource()
 			.withSourceDirectory('source')
 			.withDependencies() {
-				compileOnly 'org.apache.groovy:groovy:5.0.6'
-				implementation 'nz.net.ultraq.groovy:groovy-extensions:4.0.0'
+				compileOnly 'org.apache.groovy:groovy:5.0.7'
 				implementation 'org.slf4j:slf4j-api:2.0.18'
 			}
 			.expandExtensionModuleVersion()
 		.configureVerification()
 			.withTestDirectory('test')
 			.withTestDependencies() {
-				testImplementation 'com.github.valfirst:slf4j-test:3.0.3'
-				testImplementation 'org.assertj:assertj-core:3.27.7'
 				testImplementation 'org.spockframework:spock-core:2.4-groovy-5.0'
 			}
 			.useJUnitJupiter()

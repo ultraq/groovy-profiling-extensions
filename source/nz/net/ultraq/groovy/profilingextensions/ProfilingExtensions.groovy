@@ -17,25 +17,20 @@
 package nz.net.ultraq.groovy.profilingextensions
 
 import org.slf4j.Logger
-import org.slf4j.Marker
-import org.slf4j.MarkerFactory
 
 import groovy.transform.CompileStatic
 
 /**
- * Extensions, often to the main {@code Object} class, for aiding with profiling
- * and performance testing.
+ * Extensions on the {@code Object} class for aiding with profiling and
+ * performance testing.  These extensions are simply convenience methods to
+ * building the appropriate {@link Profiler}.
  *
  * @author Emanuel Rabina
  */
 @CompileStatic
 class ProfilingExtensions {
 
-	static final Marker profilingMarker = MarkerFactory.getMarker("Profiling")
-
-	private static final Map<String,Integer> executionsPerAction = [:]
-	private static final Map<String,List<Long>> executionTimesPerAction = [:]
-	private static final Map<String,Long> lastExecutionTimePerAction = [:]
+	private static final Map<String, Profiler> profilers = [:]
 
 	/**
 	 * Log the average time it takes to complete the given closure, using the
@@ -46,7 +41,9 @@ class ProfilingExtensions {
 	 * just calls the closure.
 	 *
 	 * @param self
-	 * @param actionName
+	 * @param format
+	 *   A logging format string into which to emit the average time.  Should
+	 *   contain one {@code {}} placeholder.
 	 * @param samples
 	 *   The number of previous executions to include in average calculation.
 	 * @param logger
@@ -54,26 +51,13 @@ class ProfilingExtensions {
 	 * @return
 	 *   The value returned from the closure.
 	 */
-	static <T> T average(Object self, String actionName, int samples, Logger logger, Closure<T> closure) {
+	static <T> T average(Object self, String format, int samples, Logger logger, Closure<T> closure) {
 
-		if (logger.debugEnabled) {
-			var executionKey = logger.name + actionName
-			var result = sample(executionKey, samples, closure)
-			var executionTimes = executionTimesPerAction[executionKey]
-			if (executionTimes.size() > samples) {
-				executionTimes.remove(0)
-			}
-
-			var executions = (executionsPerAction[executionKey] ?: 0) + 1
-			if (executions % samples == 0) {
-				logger.debug(profilingMarker, '{} average time: {}ms', actionName, String.format('%.2f', executionTimes.average()))
-			}
-			executionsPerAction[executionKey] = executions
-
-			return result
-		}
-
-		return closure()
+		return profilers
+			.computeIfAbsent(logger.name + format, key -> {
+				return new Profiler(logger, format, new SampleLoggingStrategy(samples))
+			})
+			.average(closure)
 	}
 
 	/**
@@ -86,34 +70,22 @@ class ProfilingExtensions {
 	 * just calls the closure.
 	 *
 	 * @param self
-	 * @param actionName
+	 * @param format
+	 *   A logging format string into which to emit the average time.  Should
+	 *   contain one {@code {}} placeholder.
 	 * @param seconds
 	 * @param logger
 	 * @param closure
 	 * @return
 	 *   The value returned from the closure.
 	 */
-	static <T> T average(Object self, String actionName, float seconds, Logger logger, Closure<T> closure) {
+	static <T> T average(Object self, String format, float seconds, Logger logger, Closure<T> closure) {
 
-		if (logger.debugEnabled) {
-			var executionKey = logger.name + actionName
-			var result = sample(executionKey, 0, closure)
-			var executionTimes = executionTimesPerAction[executionKey]
-			var lastExecutionTime = lastExecutionTimePerAction.getOrCreate(executionKey) { ->
-				return System.currentTimeMillis()
-			}
-
-			var currentExecutionTime = System.currentTimeMillis()
-			if ((currentExecutionTime - lastExecutionTime) / 1000 >= seconds) {
-				logger.debug(profilingMarker, '{} average time: {}ms', actionName, String.format('%.2f', executionTimes.average()))
-				lastExecutionTimePerAction[executionKey] = currentExecutionTime
-				executionTimes.clear()
-			}
-
-			return result
-		}
-
-		return closure()
+		return profilers
+			.computeIfAbsent(logger.name + format, key -> {
+				return new Profiler(logger, format, new TimedLoggingStrategy(seconds))
+			})
+			.average(closure)
 	}
 
 	/**
@@ -121,7 +93,9 @@ class ProfilingExtensions {
 	 * nanosecond precision.
 	 *
 	 * @param self
-	 * @param actionName
+	 * @param format
+	 *   A logging format string into which to emit the average time.  Should
+	 *   contain one {@code {}} placeholder.
 	 * @param samples
 	 *   The number of previous executions to include in average calculation.
 	 * @param logger
@@ -129,26 +103,13 @@ class ProfilingExtensions {
 	 * @return
 	 *   The value returned from the closure.
 	 */
-	static <T> T averageNanos(Object self, String actionName, int samples, Logger logger, Closure<T> closure) {
+	static <T> T averageNanos(Object self, String format, int samples, Logger logger, Closure<T> closure) {
 
-		if (logger.debugEnabled) {
-			var executionKey = logger.name + actionName
-			var result = sampleNanos(executionKey, samples, closure)
-			var executionTimes = executionTimesPerAction[executionKey]
-			if (executionTimes.size() > samples) {
-				executionTimes.remove(0)
-			}
-
-			var executions = (executionsPerAction[executionKey] ?: 0) + 1
-			if (executions % samples == 0) {
-				logger.debug(profilingMarker, '{} average time: {}ns', actionName, String.format('%.2f', executionTimes.average()))
-			}
-			executionsPerAction[executionKey] = executions
-
-			return result
-		}
-
-		return closure()
+		return profilers
+			.computeIfAbsent(logger.name + format, key -> {
+				return new Profiler(logger, format, new SampleLoggingStrategy(samples), new NanosecondTimer())
+			})
+			.average(closure)
 	}
 
 	/**
@@ -156,116 +117,22 @@ class ProfilingExtensions {
 	 * with nanosecond precision.
 	 *
 	 * @param self
-	 * @param actionName
+	 * @param format
+	 *   A logging format string into which to emit the average time.  Should
+	 *   contain one {@code {}} placeholder.
 	 * @param seconds
 	 * @param logger
 	 * @param closure
 	 * @return
 	 *   The value returned from the closure.
 	 */
-	static <T> T averageNanos(Object self, String actionName, float seconds, Logger logger, Closure<T> closure) {
+	static <T> T averageNanos(Object self, String format, float seconds, Logger logger, Closure<T> closure) {
 
-		if (logger.debugEnabled) {
-			var executionKey = logger.name + actionName
-			var result = sampleNanos(executionKey, 0, closure)
-			var executionTimes = executionTimesPerAction[executionKey]
-			var lastExecutionTime = lastExecutionTimePerAction.getOrCreate(executionKey) { ->
-				return System.currentTimeMillis()
-			}
-
-			var currentExecutionTime = System.currentTimeMillis()
-			if ((currentExecutionTime - lastExecutionTime) / 1000 >= seconds) {
-				logger.debug(profilingMarker, '{} average time: {}ns', actionName, String.format('%.2f', executionTimes.average()))
-				lastExecutionTimePerAction[executionKey] = currentExecutionTime
-				executionTimes.clear()
-			}
-
-			return result
-		}
-
-		return closure()
-	}
-
-	/**
-	 * Sample, with millisecond precision, the amount of time it takes to complete
-	 * the given closure.
-	 *
-	 * @param actionName
-	 * @param samples
-	 * @param closure
-	 * @return
-	 *   The value returned from the closure.
-	 */
-	private static <T> T sample(String executionKey, int samples, Closure<T> closure) {
-
-		var start = System.currentTimeMillis()
-		var result = closure()
-		var finish = System.currentTimeMillis()
-		var executionTime = finish - start
-
-		var executionTimes = executionTimesPerAction.getOrCreate(executionKey) { ->
-			return new ArrayList<Long>(samples)
-		}
-		executionTimes << executionTime
-
-		return result
-	}
-
-	/**
-	 * Sample, with nanosecond precision, the amount of time it takes to complete
-	 * the given closure.
-	 *
-	 * @param executionKey
-	 * @param samples
-	 * @param closure
-	 * @return
-	 *   The value returned from the closure.
-	 */
-	private static <T> T sampleNanos(String executionKey, int samples, Closure<T> closure) {
-
-		var start = System.nanoTime()
-		var result = closure()
-		var finish = System.nanoTime()
-		var executionTime = finish - start
-
-		var executionTimes = executionTimesPerAction.getOrCreate(executionKey) { ->
-			return new ArrayList<Long>(samples)
-		}
-		executionTimes << executionTime
-
-		return result
-	}
-
-	/**
-	 * Capture and return the time it takes to perform the given closure.
-	 *
-	 * @param self
-	 * @param closure
-	 * @return
-	 *   The time the closure took, in milliseconds, to complete.
-	 */
-	static long time(Object self, Closure closure) {
-
-		var start = System.currentTimeMillis()
-		closure()
-		var finish = System.currentTimeMillis()
-		return finish - start
-	}
-
-	/**
-	 * The same as {@link #time(Object, Closure)} but with nanosecond precision.
-	 *
-	 * @param self
-	 * @param closure
-	 * @return
-	 *   The time the closure took, in nanoseconds, to complete.
-	 */
-	static long timeNanos(Object self, Closure closure) {
-
-		var start = System.nanoTime()
-		closure()
-		var finish = System.nanoTime()
-		return finish - start
+		return profilers
+			.computeIfAbsent(logger.name + format, key -> {
+				return new Profiler(logger, format, new TimedLoggingStrategy(seconds), new NanosecondTimer())
+			})
+			.average(closure)
 	}
 
 	/**
@@ -275,26 +142,21 @@ class ProfilingExtensions {
 	 * just calls the closure.
 	 *
 	 * @param self
-	 * @param actionName
+	 * @param format
+	 *   A logging format string into which to emit the time.  Should contain one
+	 *   {@code {}} placeholder.
 	 * @param closure
 	 * @param logger
 	 * @return
 	 *   The value returned from the closure.
 	 */
-	static <T> T time(Object self, String actionName, Logger logger, Closure<T> closure) {
+	static <T> T time(Object self, String format, Logger logger, Closure<T> closure) {
 
-		if (logger.debugEnabled) {
-			var start = System.currentTimeMillis()
-			var result = closure()
-			var finish = System.currentTimeMillis()
-			var executionTime = finish - start
-
-			logger.debug(profilingMarker, '{} execution time: {}ms', actionName, executionTime)
-
-			return result
-		}
-
-		return closure()
+		return profilers
+			.computeIfAbsent(logger.name + format, key -> {
+				return new Profiler(logger, format)
+			})
+			.time(closure)
 	}
 
 	/**
@@ -302,88 +164,20 @@ class ProfilingExtensions {
 	 * nanosecond precision.
 	 *
 	 * @param self
-	 * @param actionName
+	 * @param format
+	 *   A logging format string into which to emit the time.  Should contain one
+	 *   {@code {}} placeholder.
 	 * @param logger
 	 * @param closure
 	 * @return
 	 *   The value returned from the closure.
 	 */
-	static <T> T timeNanos(Object self, String actionName, Logger logger, Closure<T> closure) {
+	static <T> T timeNanos(Object self, String format, Logger logger, Closure<T> closure) {
 
-		if (logger.debugEnabled) {
-			var start = System.nanoTime()
-			var result = closure()
-			var finish = System.nanoTime()
-			var executionTime = finish - start
-
-			logger.debug(profilingMarker, '{} execution time: {}ns', actionName, executionTime)
-
-			return result
-		}
-
-		return closure()
-	}
-
-	/**
-	 * Capture and log the time it takes to perform the given closure, and the
-	 * average of the last {@code samples} executions of the specific action.
-	 *
-	 * @param self
-	 * @param actionName
-	 * @param samples
-	 *   The number of previous executions to include in average calculation.
-	 * @param logger
-	 * @param closure
-	 * @return
-	 *   The value returned from the closure.
-	 */
-	static <T> T timeWithAverage(Object self, String actionName, int samples, Logger logger, Closure<T> closure) {
-
-		if (logger.debugEnabled) {
-			var executionKey = logger.name + actionName
-			var result = sample(executionKey, samples, closure)
-			var executionTimes = executionTimesPerAction[executionKey]
-			if (executionTimes.size() > samples) {
-				executionTimes.remove(0)
-			}
-
-			logger.debug(profilingMarker, '{} execution time: {}ms, average time: {}ms',
-				actionName, executionTimes.last(), String.format('%.2f', executionTimes.average()))
-
-			return result
-		}
-
-		return closure()
-	}
-
-	/**
-	 * The same as {@link #timeWithAverage} but with nanosecond precision.
-	 *
-	 * @param self
-	 * @param actionName
-	 * @param samples
-	 *   The number of previous executions to include in average calculation.
-	 * @param logger
-	 * @param closure
-	 * @return
-	 *   The value returned from the closure.
-	 */
-	static <T> T timeWithAverageNanos(Object self, String actionName, int samples, Logger logger, Closure<T> closure) {
-
-		if (logger.debugEnabled) {
-			var executionKey = logger.name + actionName
-			var result = sampleNanos(executionKey, samples, closure)
-			var executionTimes = executionTimesPerAction[executionKey]
-			if (executionTimes.size() > samples) {
-				executionTimes.remove(0)
-			}
-
-			logger.debug(profilingMarker, '{} execution time: {}ns, average time: {}ns',
-				actionName, executionTimes.last(), String.format('%.2f', executionTimes.average()))
-
-			return result
-		}
-
-		return closure()
+		return profilers
+			.computeIfAbsent(logger.name + format, key -> {
+				return new Profiler(logger, format, null, new NanosecondTimer())
+			})
+			.time(closure)
 	}
 }

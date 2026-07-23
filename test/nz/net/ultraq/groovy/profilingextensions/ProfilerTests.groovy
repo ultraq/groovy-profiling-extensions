@@ -1,5 +1,5 @@
 /*
- * Copyright 2021, Emanuel Rabina (http://www.ultraq.net.nz/)
+ * Copyright 2026, Emanuel Rabina (http://www.ultraq.net.nz/)
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -20,29 +20,29 @@ import org.slf4j.Logger
 import spock.lang.Specification
 
 /**
- * Tests for the profiling extension methods.
+ * Tests for the standalone profiler class.
  *
  * @author Emanuel Rabina
  */
-class ProfilingExtensionsTests extends Specification {
+class ProfilerTests extends Specification {
 
 	def 'average - Log the average of all executions after the given amount of time'() {
 		given:
 			var logger = Mock(Logger) {
-				getName() >> 'AverageTimeLogger'
 				isDebugEnabled() >> true
 			}
+			var profiler = new Profiler(logger, 'Average: {}ms', new TimedLoggingStrategy(1f))
 		when:
 			var start = System.currentTimeMillis()
 			var result
 			while (true) {
-				result = average('Average: {}ms', 1f, logger) { ->
+				result = profiler.average { ->
 					return 'Hi!'
 				}
 				if ((System.currentTimeMillis() - start) / 1000 >= 1) {
 					break
 				}
-				Thread.sleep(1000)
+				Thread.sleep(100)
 			}
 		then:
 			1 * logger.debug(Profiler.marker, 'Average: {}ms', _ as String)
@@ -52,11 +52,11 @@ class ProfilingExtensionsTests extends Specification {
 	def "average - Logs nothing if the specified time hasn't elapsed"() {
 		given:
 			var logger = Mock(Logger) {
-				getName() >> 'AverageTimeNotMetLogger'
 				isDebugEnabled() >> true
 			}
+			var profiler = new Profiler(logger, 'Average: {}ms', new TimedLoggingStrategy(1f))
 		when:
-			var result = average('Average: {}ms', 1f, logger) { ->
+			var result = profiler.average { ->
 				return 'Hi!'
 			}
 		then:
@@ -67,13 +67,13 @@ class ProfilingExtensionsTests extends Specification {
 	def "average - Logs the average time after the specified number of executions"() {
 		given:
 			var logger = Mock(Logger) {
-				getName() >> 'AverageSamplesLogger'
 				isDebugEnabled() >> true
 			}
+			var profiler = new Profiler(logger, 'Average: {}ms', new SampleLoggingStrategy(2))
 		when:
 			var result
 			2.times { i ->
-				result = average('Average: {}ms', 2, logger) { ->
+				result = profiler.average { ->
 					return 'Hi!'
 				}
 			}
@@ -85,11 +85,11 @@ class ProfilingExtensionsTests extends Specification {
 	def "average - Logs nothing if the specified number of executions hasn't been reached"() {
 		given:
 			var logger = Mock(Logger) {
-				getName() >> 'AverageSamplesNotMetLogger'
 				isDebugEnabled() >> true
 			}
+			var profiler = new Profiler(logger, 'Average: {}ms', new SampleLoggingStrategy(2))
 		when:
-			var result = average('Average: {}ms', 2, logger) { ->
+			var result = profiler.average { ->
 				return 'Hi!'
 			}
 		then:
@@ -99,11 +99,10 @@ class ProfilingExtensionsTests extends Specification {
 
 	def "average - Logs nothing if debug is not enabled on the logger"() {
 		given:
-			var logger = Mock(Logger) {
-				getName() >> 'AverageNotEnabledLogger'
-			}
+			var logger = Mock(Logger)
+			var profiler = new Profiler(logger, 'Average: {}ms', new TimedLoggingStrategy(1f))
 		when:
-			var result = average('Average: {}ms', 1f, logger) { ->
+			var result = profiler.average { ->
 				return 'Hi!'
 			}
 		then:
@@ -114,11 +113,11 @@ class ProfilingExtensionsTests extends Specification {
 	def "time - Log the time taken to execute an action"() {
 		given:
 			var logger = Mock(Logger) {
-				getName() >> 'TimeLogger'
 				isDebugEnabled() >> true
 			}
+			var profiler = new Profiler(logger, 'Time: {}ms')
 		when:
-			var result = time('Time: {}ms', logger) { ->
+			var result = profiler.time { ->
 				return 'Hi!'
 			}
 		then:
@@ -128,11 +127,10 @@ class ProfilingExtensionsTests extends Specification {
 
 	def "time - Logs nothing if debug is not enabled on the logger"() {
 		given:
-			var logger = Mock(Logger) {
-				getName() >> 'TimeNotEnabledLogger'
-			}
+			var logger = Mock(Logger)
+			var profiler = new Profiler(logger, 'Time: {}ms')
 		when:
-			var result = time('Time: {}ms', logger) { ->
+			var result = profiler.time { ->
 				return 'Hi!'
 			}
 		then:
