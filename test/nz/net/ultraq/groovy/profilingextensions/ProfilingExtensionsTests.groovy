@@ -148,4 +148,20 @@ class ProfilingExtensionsTests extends Specification {
 			0 * logger.debug(*_)
 			result == 'Hi!'
 	}
+
+	def "trackTime - Track then retrieve previous execution data"() {
+		given:
+			var key = 'ProfilerExtensionsTests::trackTimeTest'
+		when:
+			var result = null
+			3.times { i ->
+				result = trackTime(key) { ->
+					return "Hi ${i}!"
+				}
+			}
+			var executionTimes = getTimes(key)
+		then:
+			result == 'Hi 2!'
+			executionTimes.size() == 3
+	}
 }

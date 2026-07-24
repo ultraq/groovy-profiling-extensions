@@ -39,7 +39,7 @@ class Profiler {
 	final String format
 	final LoggingStrategy loggingStrategy
 	final Timer timer = new MillisecondTimer()
-	private final List<Long> executionTimes = new ArrayList<Long>()
+	private final List<Long> executionTimes = new ArrayList<>()
 
 	/**
 	 * Log the average time it takes to complete the given closure, only when the
@@ -52,9 +52,7 @@ class Profiler {
 	public <T> T average(Closure<T> closure) {
 
 		if (logger.debugEnabled) {
-			var start = timer.now()
-			var result = closure()
-			executionTimes << timer.now() - start
+			var result = trackTime(closure)
 
 			if (loggingStrategy.shouldLog()) {
 				logger.debug(marker, format, String.format('%.2f', executionTimes.average()))
@@ -65,6 +63,20 @@ class Profiler {
 		}
 
 		return closure()
+	}
+
+	/**
+	 * Return a list of previously-tracked execution times.
+	 *
+	 * @param results
+	 *   Optional, a list of lists to store the returned results, used to avoid
+	 *   the list allocation.
+	 */
+	List<Long> getTimes(List<Long> results = []) {
+
+		results.addAll(executionTimes)
+		executionTimes.clear()
+		return results
 	}
 
 	/**
@@ -83,5 +95,18 @@ class Profiler {
 		}
 
 		return closure()
+	}
+
+	/**
+	 * Track the time it takes to complete the given closure.  Execution times
+	 * must then be retrieved with {@link #getTimes} to relieve the memory being
+	 * used to store them.
+	 */
+	<T> T trackTime(Closure<T> closure) {
+
+		var start = timer.now()
+		var result = closure()
+		executionTimes << timer.now() - start
+		return result
 	}
 }

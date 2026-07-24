@@ -71,7 +71,7 @@ class ProfilerTests extends Specification {
 			}
 			var profiler = new Profiler(logger, 'Average: {}ms', new SampleLoggingStrategy(2))
 		when:
-			var result
+			var result = null
 			2.times { i ->
 				result = profiler.average { ->
 					return 'Hi!'
@@ -136,5 +136,21 @@ class ProfilerTests extends Specification {
 		then:
 			0 * logger.debug(*_)
 			result == 'Hi!'
+	}
+
+	def "trackTime - Track then retrieve previous execution data"() {
+		given:
+			var profiler = new Profiler()
+		when:
+			var result = null
+			3.times { i ->
+				result = profiler.trackTime() { ->
+					return "Hi ${i}!"
+				}
+			}
+			var executionTimes = profiler.getTimes()
+		then:
+			result == 'Hi 2!'
+			executionTimes.size() == 3
 	}
 }

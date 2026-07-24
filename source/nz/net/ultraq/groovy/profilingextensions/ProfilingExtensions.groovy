@@ -136,6 +136,25 @@ class ProfilingExtensions {
 	}
 
 	/**
+	 * Return a list of previously-tracked execution times.
+	 *
+	 * @param self
+	 * @param key
+	 * @param results
+	 *   Optional, a list of lists to store the returned results, used to avoid
+	 *   the list allocation.
+	 * @return
+	 */
+	static List<Long> getTimes(Object self, String key, List<Long> results = []) {
+
+		return profilers
+			.computeIfAbsent(key, _ -> {
+				return new Profiler()
+			})
+			.getTimes(results)
+	}
+
+	/**
 	 * Capture and return the time it takes, in milliseconds, to perform the given
 	 * closure.
 	 */
@@ -190,5 +209,27 @@ class ProfilingExtensions {
 				return new Profiler(logger, format, null, new NanosecondTimer())
 			})
 			.time(closure)
+	}
+
+	/**
+	 * Track the time it takes to complete the given closure and store it and
+	 * future executions against a provided key.  Execution times must then be
+	 * retrieved with {@link #getTimes} to relieve the memory being used to store
+	 * them.
+	 *
+	 * @param self
+	 * @param key
+	 *   The key must be globally unique across the application.
+	 * @param closure
+	 * @return
+	 *   The value returned from the closure.
+	 */
+	static <T> T trackTime(Object self, String key, Closure<T> closure) {
+
+		return profilers
+			.computeIfAbsent(key, _ -> {
+				return new Profiler()
+			})
+			.trackTime(closure)
 	}
 }
