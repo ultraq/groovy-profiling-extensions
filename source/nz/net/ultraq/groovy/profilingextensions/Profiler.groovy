@@ -69,8 +69,8 @@ class Profiler {
 	 * Return a list of previously-tracked execution times.
 	 *
 	 * @param results
-	 *   Optional, a list of lists to store the returned results, used to avoid
-	 *   the list allocation.
+	 *   Optional, a list to store the returned results, used to avoid the list
+	 *   allocation.
 	 */
 	List<Long> getTimes(List<Long> results = []) {
 

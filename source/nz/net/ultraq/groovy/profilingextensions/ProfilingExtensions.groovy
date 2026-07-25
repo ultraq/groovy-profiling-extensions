@@ -141,8 +141,8 @@ class ProfilingExtensions {
 	 * @param self
 	 * @param key
 	 * @param results
-	 *   Optional, a list of lists to store the returned results, used to avoid
-	 *   the list allocation.
+	 *   Optional, a list to store the returned results, used to avoid the list
+	 *   allocation.
 	 * @return
 	 */
 	static List<Long> getTimes(Object self, String key, List<Long> results = []) {
