@@ -33,7 +33,9 @@ import groovy.transform.TupleConstructor
 @TupleConstructor
 class Profiler {
 
-	public static final Marker marker = MarkerFactory.getMarker("Profiler")
+	public static final Marker PROFILER_MARKER = MarkerFactory.getMarker("profiler")
+	public static final Marker AVERAGE_MARKER = MarkerFactory.getMarker("average")
+	public static final Marker TIME_MARKER = MarkerFactory.getMarker("time")
 
 	final Logger logger
 	final String format
@@ -55,7 +57,10 @@ class Profiler {
 			var result = trackTime(closure)
 
 			if (loggingStrategy.shouldLog()) {
-				logger.debug(marker, format, String.format('%.2f', executionTimes.average()))
+				logger.atDebug()
+					.addMarker(PROFILER_MARKER)
+					.addMarker(AVERAGE_MARKER)
+					.log(format, String.format('%.2f', executionTimes.average()))
 				executionTimes.clear()
 			}
 
@@ -89,7 +94,10 @@ class Profiler {
 			var result = closure()
 			var executionTime = timer.now() - start
 
-			logger.debug(marker, format, executionTime)
+			logger.atDebug()
+				.addMarker(PROFILER_MARKER)
+				.addMarker(TIME_MARKER)
+				.log(format, executionTime)
 
 			return result
 		}

@@ -45,7 +45,7 @@ class ProfilerTests extends Specification {
 				Thread.sleep(100)
 			}
 		then:
-			1 * logger.debug(Profiler.marker, 'Average: {}ms', _ as String)
+			1 * logger.debug(Profiler.PROFILER_MARKER, 'Average: {}ms', _ as String)
 			result == 'Hi!'
 	}
 
@@ -78,7 +78,7 @@ class ProfilerTests extends Specification {
 				}
 			}
 		then:
-			1 * logger.debug(Profiler.marker, 'Average: {}ms', _ as String)
+			1 * logger.debug(Profiler.PROFILER_MARKER, 'Average: {}ms', _ as String)
 			result == 'Hi!'
 	}
 
@@ -121,7 +121,7 @@ class ProfilerTests extends Specification {
 				return 'Hi!'
 			}
 		then:
-			1 * logger.debug(Profiler.marker, 'Time: {}ms', _ as Number)
+			1 * logger.debug(Profiler.PROFILER_MARKER, 'Time: {}ms', _ as Number)
 			result == 'Hi!'
 	}
 
