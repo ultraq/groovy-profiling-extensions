@@ -17,6 +17,8 @@
 package nz.net.ultraq.groovy.profilingextensions
 
 import org.slf4j.Logger
+import org.slf4j.Marker
+import org.slf4j.spi.LoggingEventBuilder
 import spock.lang.Specification
 
 /**
@@ -26,12 +28,21 @@ import spock.lang.Specification
  */
 class ProfilingExtensionsTests extends Specification {
 
+	LoggingEventBuilder loggingEventBuilder
+	Logger logger
+
+	def setup() {
+		loggingEventBuilder = Mock(LoggingEventBuilder)
+		loggingEventBuilder.addMarker(_ as Marker) >> loggingEventBuilder
+		logger = Mock(Logger) {
+			atDebug() >> loggingEventBuilder
+			isDebugEnabled() >> true
+		}
+	}
+
 	def 'average - Log the average of all executions after the given amount of time'() {
 		given:
-			var logger = Mock(Logger) {
-				getName() >> 'AverageTimeLogger'
-				isDebugEnabled() >> true
-			}
+			logger.getName() >> 'AverageTimeLogger'
 		when:
 			var start = System.currentTimeMillis()
 			var result
@@ -45,31 +56,25 @@ class ProfilingExtensionsTests extends Specification {
 				Thread.sleep(1000)
 			}
 		then:
-			1 * logger.debug(Profiler.PROFILER_MARKER, 'Average: {}ms', _ as String)
+			1 * loggingEventBuilder.log('Average: {}ms', _ as String)
 			result == 'Hi!'
 	}
 
 	def "average - Logs nothing if the specified time hasn't elapsed"() {
 		given:
-			var logger = Mock(Logger) {
-				getName() >> 'AverageTimeNotMetLogger'
-				isDebugEnabled() >> true
-			}
+			logger.getName() >> 'AverageTimeNotMetLogger'
 		when:
 			var result = average('Average: {}ms', 1f, logger) { ->
 				return 'Hi!'
 			}
 		then:
-			0 * logger.debug(*_)
+			0 * loggingEventBuilder.log(*_)
 			result == 'Hi!'
 	}
 
 	def "average - Logs the average time after the specified number of executions"() {
 		given:
-			var logger = Mock(Logger) {
-				getName() >> 'AverageSamplesLogger'
-				isDebugEnabled() >> true
-			}
+			logger.getName() >> 'AverageSamplesLogger'
 		when:
 			var result
 			2.times { i ->
@@ -78,28 +83,26 @@ class ProfilingExtensionsTests extends Specification {
 				}
 			}
 		then:
-			1 * logger.debug(Profiler.PROFILER_MARKER, 'Average: {}ms', _ as String)
+			1 * loggingEventBuilder.log('Average: {}ms', _ as String)
 			result == 'Hi!'
 	}
 
 	def "average - Logs nothing if the specified number of executions hasn't been reached"() {
 		given:
-			var logger = Mock(Logger) {
-				getName() >> 'AverageSamplesNotMetLogger'
-				isDebugEnabled() >> true
-			}
+			logger.getName() >> 'AverageSamplesNotMetLogger'
 		when:
 			var result = average('Average: {}ms', 2, logger) { ->
 				return 'Hi!'
 			}
 		then:
-			0 * logger.debug(*_)
+			0 * loggingEventBuilder.log(*_)
 			result == 'Hi!'
 	}
 
 	def "average - Logs nothing if debug is not enabled on the logger"() {
 		given:
 			var logger = Mock(Logger) {
+				atDebug() >> loggingEventBuilder
 				getName() >> 'AverageNotEnabledLogger'
 			}
 		when:
@@ -107,7 +110,7 @@ class ProfilingExtensionsTests extends Specification {
 				return 'Hi!'
 			}
 		then:
-			0 * logger.debug(*_)
+			0 * loggingEventBuilder.log(*_)
 			result == 'Hi!'
 	}
 
@@ -122,22 +125,20 @@ class ProfilingExtensionsTests extends Specification {
 
 	def "time - Log the time taken to execute an action"() {
 		given:
-			var logger = Mock(Logger) {
-				getName() >> 'TimeLogger'
-				isDebugEnabled() >> true
-			}
+			logger.getName() >> 'TimeLogger'
 		when:
 			var result = time('Time: {}ms', logger) { ->
 				return 'Hi!'
 			}
 		then:
-			1 * logger.debug(Profiler.PROFILER_MARKER, 'Time: {}ms', _ as Number)
+			1 * loggingEventBuilder.log('Time: {}ms', _ as Number)
 			result == 'Hi!'
 	}
 
 	def "time - Logs nothing if debug is not enabled on the logger"() {
 		given:
 			var logger = Mock(Logger) {
+				atDebug() >> loggingEventBuilder
 				getName() >> 'TimeNotEnabledLogger'
 			}
 		when:
@@ -145,7 +146,7 @@ class ProfilingExtensionsTests extends Specification {
 				return 'Hi!'
 			}
 		then:
-			0 * logger.debug(*_)
+			0 * loggingEventBuilder.log(*_)
 			result == 'Hi!'
 	}
 
